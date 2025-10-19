@@ -3,14 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Rainfall in Australia</title>
+  <title>Rainfall Patterns in Australia</title>
 
   <!-- Vega libs -->
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <style>
+    h1, p.header-sub { text-align:center; margin: 0.25rem 0 1rem; }
+  </style>
 </head>
 <body>
+  <h1>Rainfall Patterns in Australia</h1>
+  <p class="header-sub"><strong>Melanie Paaris 33116121</strong></p>
+
   <h2>National Annual Rainfall</h2>
   <div id="trend"></div>
 
@@ -20,7 +26,7 @@
   <h2>Rainfall by State (Choropleth)</h2>
   <div id="map"></div>
 
-  <!-- ========== trend  ========== -->
+  <!-- ===== SPEC 1: Trend ===== -->
   <script type="application/json" id="spec-trend">
   {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -33,7 +39,12 @@
     ],
     "mark": { "type": "line", "point": true },
     "encoding": {
-      "x": { "field": "Year", "type": "quantitative", "title": "Year" },
+      "x": {
+        "field": "Year",
+        "type": "quantitative",
+        "title": "Year",
+        "axis": { "format": "d", "tickMinStep": 1 }
+      },
       "y": { "field": "rain_mm", "type": "quantitative", "title": "Rainfall (mm)" },
       "tooltip": [
         { "field": "Year", "type": "quantitative" },
@@ -43,7 +54,7 @@
   }
   </script>
 
-  <!-- ========== top locations with slider ========== -->
+  <!-- ===== SPEC 2: Top locations with slider ===== -->
   <script type="application/json" id="spec-toploc">
   {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -52,7 +63,7 @@
     "title": "Top 10 Locations by Average Rainfall",
     "params": [
       { "name": "year_sel", "value": 2017,
-        "bind": { "input": "range", "min": 2008, "max": 2017, "step": 1 } }
+        "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 } }
     ],
     "data": { "url": "rainfall_by_location.csv" },
     "transform": [
@@ -74,7 +85,7 @@
   }
   </script>
 
-  <!-- ==========  map ========== -->
+  <!-- ===== SPEC 3: Map (joins by state abbreviation) ===== -->
   <script type="application/json" id="spec-map">
   {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -87,7 +98,12 @@
     },
     "transform": [
       {
-        "lookup": "properties.STATE_NAME",
+        "calculate":
+          "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
+        "as": "abbr"
+      },
+      {
+        "lookup": "abbr",
         "from": {
           "data": { "url": "rainfall_by_state_2017.csv" },
           "key": "State",
@@ -106,13 +122,14 @@
       },
       "tooltip": [
         { "field": "properties.STATE_NAME", "type": "nominal", "title": "State" },
+        { "field": "abbr", "type": "nominal", "title": "Code" },
         { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "Avg (mm)" }
       ]
     }
   }
   </script>
 
-  <!-- ========== Embed the three specs ========== -->
+  <!-- ===== Embed all three ===== -->
   <script>
     const trendSpec  = JSON.parse(document.getElementById('spec-trend').textContent);
     const toplocSpec = JSON.parse(document.getElementById('spec-toploc').textContent);
@@ -124,6 +141,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
