@@ -123,7 +123,7 @@
   </script>
 
   <!-- Top locations spec (fixed x-axis 0–10) -->
-  <script type="application/json" id="spec-toploc">
+ <script type="application/json" id="spec-toploc">
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "width": 800,
@@ -156,7 +156,16 @@
     "color": {
       "field": "Location",
       "type": "nominal",
-      "scale": { "scheme": "tableau10" }
+      "legend": {"title": "Location"},
+      "scale": {
+        "domain": [
+          "Cairns","CoffsHarbour","Darwin","Townsville","GoldCoast",
+          "MountGambier","Tuggeranong","Wollongong","Brisbane","MountGinini",
+          "Sydney","Katherine","NorahHead","Newcastle","Williamtown",
+          "Walpole","Witchcliffe","NorfolkIsland","SydneyAirport"
+        ],
+        "scheme": "tableau20"
+      }
     },
     "tooltip": [
       { "field": "Location", "type": "nominal" },
@@ -165,6 +174,7 @@
   }
 }
 </script>
+
 
   <!-- Map spec -->
   <script type="application/json" id="spec-map">
@@ -222,4 +232,5 @@
   </script>
 </body>
 </html>
+
 
