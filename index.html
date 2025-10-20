@@ -209,10 +209,11 @@
       "from": {
         "data": {
           "url": "rainfall_by_state.csv",
-          "format": { "type": "csv", "parse": { "Year": "number" } }
+          "format": { "type": "csv" }
         },
         "transform": [
-          { "filter": "datum.Year == mapYear" }   // filter to the chosen year
+          { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
+          { "filter": "datum.YearNum == mapYear" }
         ],
         "key": "State",
         "fields": ["rain_mm"]
@@ -237,6 +238,7 @@
 }
 </script>
 
+
   <!-- ============ Embed helper ============ -->
   <script>
     function embedFromTag(target, tagId) {
@@ -253,6 +255,7 @@
   </script>
 </body>
 </html>
+
 
 
 
