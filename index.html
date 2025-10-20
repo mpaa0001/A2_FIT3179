@@ -183,7 +183,7 @@
   "width": 900,
   "height": 520,
   "title": "Rainfall by State",
-  "projection": {"type": "mercator"},
+  "projection": { "type": "mercator" },
 
   "params": [
     {
@@ -193,30 +193,24 @@
     }
   ],
 
-  /* 1) Base layer is the TopoJSON geometry */
   "data": {
     "url": "AUS_states.json",
     "format": { "type": "topojson", "feature": "AUS_states" }
   },
 
   "transform": [
-    /* Robustly grab the full state name from whichever property exists */
     {
       "calculate":
-        "(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))",
-      "as": "STATE_NAME"
-    },
-    /* Map full names -> abbreviations used by the CSV */
-    {
-      "calculate":
-        "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[datum.STATE_NAME]",
+        "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
       "as": "abbr"
     },
-    /* 2) Join rainfall for the selected year (filter INSIDE the lookup) */
     {
       "lookup": "abbr",
       "from": {
-        "data": { "url": "rainfall_by_state.csv" },
+        "data": {
+          "url": "rainfall_by_state.csv",
+          "format": { "type": "csv" }
+        },
         "transform": [
           { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
           { "filter": "datum.YearNum == mapYear" }
@@ -224,8 +218,6 @@
         "key": "State",
         "fields": ["rain_mm"]
       }
-      /* NOTE: no "as" needed since we keep the CSV field name "rain_mm" */
-      /* If you prefer to rename, use: "as": ["rain_mm"] */
     }
   ],
 
@@ -265,6 +257,7 @@
   </script>
 </body>
 </html>
+
 
 
 
