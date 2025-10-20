@@ -183,48 +183,46 @@
   "width": 900,
   "height": 520,
   "title": "Rainfall by State",
-  "projection": {"type": "mercator"},
+  "projection": { "type": "mercator" },
 
   "params": [
-    { "name": "mapYear",
+    {
+      "name": "mapYear",
       "value": 2017,
       "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
     }
   ],
 
-
-  "data": { "url": "rainfall_by_state.csv" },
+  "data": {
+    "url": "AUS_states.json",
+    "format": { "type": "topojson", "feature": "AUS_states" }
+  },
 
   "transform": [
-    { "calculate": "toNumber(datum.Year)", "as": "Y" },
-    { "filter": "datum.Y == mapYear" },
-
- 
     {
       "calculate":
-        "({'NSW':'New South Wales','NT':'Northern Territory','QLD':'Queensland','SA':'South Australia','TAS':'Tasmania','VIC':'Victoria','WA':'Western Australia','ACT':'Australian Capital Territory'})[datum.State]",
-      "as": "STATE_NAME"
+        "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
+      "as": "abbr"
     },
-
-  
     {
-      "lookup": "STATE_NAME",
+      "lookup": "abbr",
       "from": {
         "data": {
-          "url": "AUS_states.json",
-          "format": { "type": "topojson", "feature": "AUS_states" }
+          "url": "rainfall_by_state.csv",
+          "format": { "type": "csv", "parse": { "Year": "number" } }
         },
-        "key": "properties.STATE_NAME",
-        "fields": ["type","properties","geometry"]
-      },
-      "as": "geo"
+        "transform": [
+          { "filter": "datum.Year == mapYear" }   // filter to the chosen year
+        ],
+        "key": "State",
+        "fields": ["rain_mm"]
+      }
     }
   ],
 
   "mark": { "type": "geoshape", "stroke": "white" },
 
   "encoding": {
-    "shape": { "field": "geo", "type": "geojson" },
     "color": {
       "field": "rain_mm",
       "type": "quantitative",
@@ -232,13 +230,12 @@
       "scale": { "scheme": "blues" }
     },
     "tooltip": [
-      { "field": "State", "type": "nominal", "title": "STATE" },
+      { "field": "abbr", "type": "nominal", "title": "STATE" },
       { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)" }
     ]
   }
 }
 </script>
-
 
   <!-- ============ Embed helper ============ -->
   <script>
@@ -256,6 +253,7 @@
   </script>
 </body>
 </html>
+
 
 
 
