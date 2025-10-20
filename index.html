@@ -5,98 +5,99 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Rainfall Patterns in Australia</title>
 
+  <!-- Vega libraries -->
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
   <style>
-    h1, p.header-sub { text-align:center; margin: 0.25rem 0 1rem; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 18px; }
+    h1, p.header-sub { text-align: center; margin: 0.25rem 0 1rem; }
+
+    /* ---- Trend row: chart left, notes right ---- */
+    .trend-row{
+      display:flex;
+      gap:16px;
+      align-items:flex-start;      /* top-align both */
+      margin-bottom: 24px;
+    }
+    .trend-chart{
+      flex:1 1 auto;               /* chart grows */
+      min-width:640px;             /* keep room for notes on wide screens */
+      min-height:320px;
+    }
+    .trend-notes{
+      flex:0 0 360px;              /* fixed notes column */
+      border:1px solid #e5e7eb; border-radius:8px;
+      padding:10px 12px; background:#fff; line-height:1.35;
+    }
+
+    @media (max-width: 900px){
+      .trend-row{ flex-direction: column; }
+      .trend-chart{ min-width: 0; }
+    }
   </style>
 </head>
 <body>
   <h1>Rainfall Patterns in Australia</h1>
   <p class="header-sub"><strong>Melanie Paaris 33116121</strong></p>
 
+  <!-- ===== National Annual Rainfall (chart + notes) ===== -->
   <h2>National Annual Rainfall</h2>
-  <div id="trend"></div>
+  <section class="trend-row">
+    <!-- SINGLE trend chart container (keep this id unique) -->
+    <div id="trend" class="trend-chart"></div>
 
+    <!-- Notes pinned to the right of the chart -->
+    <aside class="trend-notes">
+      <ul style="margin:0; padding-left:1rem;">
+        <li><strong>Wettest period:</strong> 2010–2011 sits clearly above the mean, indicating an unusually wet couple of years.</li>
+        <li><strong>Driest year:</strong> 2014 falls well below the mean, marking the decade’s low point.</li>
+        <li><strong>Overall pattern:</strong> No strong long-term trend — rise to 2011, decrease to 2014, then steady recovery; most years near the mean.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- ===== Top 10 Locations ===== -->
   <h2>Top 10 Locations (by year)</h2>
   <div id="toploc"></div>
 
+  <!-- ===== Map ===== -->
   <h2>Rainfall by State (Choropleth)</h2>
   <div id="map"></div>
 
-<!-- ===== National Annual Rainfall (chart left, notes right) ===== -->
-<!-- ===== National Annual Rainfall (chart left, notes right) ===== -->
-<style>
-  .trend-row{
-    display:flex;
-    gap:16px;
-    align-items:flex-start;         /* TOP-align both */
-  }
-  .trend-chart{
-    flex:1 1 auto;                  /* fill remaining width */
-    min-width:640px;                /* keep room for notes */
-    min-height:320px;
-  }
-  .trend-notes{
-    flex:0 0 360px;                 /* fixed width column on the right */
-    align-self:flex-start !important;  /* pin to top, override anything else */
-    border:1px solid #e5e7eb; border-radius:8px;
-    padding:10px 12px; background:#fff; line-height:1.35;
-    margin-top:0 !important;
-  }
-  /* Only stack on small screens (adjust threshold if you like) */
-  @media (max-width:900px){
-    .trend-row{ flex-direction:column; }
-    .trend-chart{ min-width:0; }
-  }
-</style>
+  <!-- =================== Vega-Lite SPECS =================== -->
 
-<h2>National Annual Rainfall</h2>
-
-<section class="trend-row">
-  <div id="trend" class="trend-chart"></div>
-
-  <aside class="trend-notes">
-    <ul style="margin:0; padding-left:1rem;">
-      <li><strong>Wettest period:</strong> 2010–2011 sits clearly above the mean, indicating an unusually wet couple of years.</li>
-      <li><strong>Driest year:</strong> 2014 falls well below the mean, marking the decade’s low point.</li>
-      <li><strong>Overall pattern:</strong> No strong long-term trend — rise to 2011, decrease to 2014, then steady recovery; most years near the mean.</li>
-    </ul>
-  </aside>
-</section>
-
-<script type="application/json" id="spec-trend">
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 900,
-  "height": 320,
-  "title": "Average Annual Rainfall — Australia (2008–2017)",
-  "data": { "url": "rainfall_timeseries.csv" },
-  "transform": [{ "filter": "datum.Year >= 2008 && datum.Year <= 2017" }],
-  "layer": [
-    {
-      "transform": [{ "aggregate": [{ "op": "mean", "field": "rain_mm", "as": "mean_mm" }] }],
-      "mark": { "type": "rule", "strokeDash": [6,4], "color": "#888" },
-      "encoding": { "y": { "field": "mean_mm", "type": "quantitative", "title": "Rainfall (mm)" } }
-    },
-    {
-      "mark": { "type": "line", "point": true },
-      "encoding": {
-        "x": { "field": "Year", "type": "quantitative", "title": "Year", "axis": { "format": "d", "tickMinStep": 1 } },
-        "y": { "field": "rain_mm", "type": "quantitative", "title": "Rainfall (mm)" },
-        "tooltip": [
-          { "field": "Year", "type": "quantitative" },
-          { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "Avg (mm)" }
-        ]
+  <!-- Trend with mean line -->
+  <script type="application/json" id="spec-trend">
+  {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": { "type": "fit", "contains": "padding" },
+    "width": "container",
+    "height": 320,
+    "title": "Average Annual Rainfall — Australia (2008–2017)",
+    "data": { "url": "rainfall_timeseries.csv" },
+    "transform": [{ "filter": "datum.Year >= 2008 && datum.Year <= 2017" }],
+    "layer": [
+      {
+        "transform": [{ "aggregate": [{ "op": "mean", "field": "rain_mm", "as": "mean_mm" }] }],
+        "mark": { "type": "rule", "strokeDash": [6,4], "color": "#888" },
+        "encoding": { "y": { "field": "mean_mm", "type": "quantitative", "title": "Rainfall (mm)" } }
+      },
+      {
+        "mark": { "type": "line", "point": true },
+        "encoding": {
+          "x": { "field": "Year", "type": "quantitative", "title": "Year", "axis": { "format": "d", "tickMinStep": 1 } },
+          "y": { "field": "rain_mm", "type": "quantitative", "title": "Rainfall (mm)" },
+          "tooltip": [
+            { "field": "Year", "type": "quantitative" },
+            { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "Avg (mm)" }
+          ]
+        }
       }
-    }
-  ]
-}
-</script>
-
-
+    ]
+  }
+  </script>
 
 
 
@@ -189,6 +190,7 @@
   </script>
 </body>
 </html>
+
 
 
 
