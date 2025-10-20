@@ -121,7 +121,7 @@
   }
   </script>
 
-  <!-- Top locations spec (fixed x-axis 0–10) -->
+  <!-- Top locations spec (fixed x-axis 0–10 + distinct color per Location) -->
   <script type="application/json" id="spec-toploc">
   {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -148,6 +148,12 @@
         "title": "Avg rainfall (mm)",
         "scale": { "domain": [0, 10], "nice": false, "clamp": true },
         "axis": { "values": [0,1,2,3,4,5,6,7,8,9,10], "tickCount": 11 }
+      },
+      "color": {
+        "field": "Location",
+        "type": "nominal",
+        "scale": { "scheme": "tableau10" }
+        /* add "legend": null to hide the legend if you prefer */
       },
       "tooltip": [
         { "field": "Location", "type": "nominal" },
@@ -213,4 +219,3 @@
   </script>
 </body>
 </html>
-
