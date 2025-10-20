@@ -124,39 +124,47 @@
 
   <!-- Top locations spec (fixed x-axis 0–10) -->
   <script type="application/json" id="spec-toploc">
-  {
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "width": 800,
-    "height": 420,
-    "title": "Top 10 Locations by Average Rainfall",
-    "params": [
-      { "name": "year_sel", "value": 2017,
-        "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 } }
-    ],
-    "data": { "url": "rainfall_by_location.csv" },
-    "transform": [
-      { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
-      { "filter": "datum.YearNum == year_sel" },
-      { "window": [ { "op": "rank", "as": "rank" } ], "sort": [ { "field": "rain_mm", "order": "descending" } ] },
-      { "filter": "datum.rank <= 10" }
-    ],
-    "mark": "bar",
-    "encoding": {
-      "y": { "field": "Location", "type": "nominal", "sort": "-x", "title": null },
-      "x": {
-        "field": "rain_mm",
-        "type": "quantitative",
-        "title": "Avg rainfall (mm)",
-        "scale": { "domain": [0, 10], "nice": false, "clamp": true },
-        "axis": { "values": [0,1,2,3,4,5,6,7,8,9,10], "tickCount": 11 }
-      },
-      "tooltip": [
-        { "field": "Location", "type": "nominal" },
-        { "field": "rain_mm", "type": "quantitative", "format": ".1f", "title": "Avg (mm)" }
-      ]
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 800,
+  "height": 420,
+  "title": "Top 10 Locations by Average Rainfall",
+  "params": [
+    {
+      "name": "year_sel",
+      "value": 2017,
+      "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
     }
+  ],
+  "data": { "url": "rainfall_by_location.csv" },
+  "transform": [
+    { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
+    { "filter": "datum.YearNum == year_sel" },
+    { "window": [ { "op": "rank", "as": "rank" } ], "sort": [ { "field": "rain_mm", "order": "descending" } ] },
+    { "filter": "datum.rank <= 10" }
+  ],
+  "mark": "bar",
+  "encoding": {
+    "y": { "field": "Location", "type": "nominal", "sort": "-x", "title": null },
+    "x": {
+      "field": "rain_mm",
+      "type": "quantitative",
+      "title": "Avg rainfall (mm)",
+      "scale": { "domain": [0, 10], "nice": false, "clamp": true },
+      "axis": { "values": [0,1,2,3,4,5,6,7,8,9,10], "tickCount": 11 }
+    },
+    "color": {
+      "field": "Location",
+      "type": "nominal",
+      "scale": { "scheme": "tableau10" }
+    },
+    "tooltip": [
+      { "field": "Location", "type": "nominal" },
+      { "field": "rain_mm", "type": "quantitative", "format": ".1f", "title": "Avg (mm)" }
+    ]
   }
-  </script>
+}
+</script>
 
   <!-- Map spec -->
   <script type="application/json" id="spec-map">
@@ -214,3 +222,4 @@
   </script>
 </body>
 </html>
+
