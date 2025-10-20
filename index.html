@@ -132,15 +132,8 @@
       "field": "rain_mm",
       "type": "quantitative",
       "title": "Avg rainfall (mm)",
-      "scale": {
-        "domain": [0, 10],     // <- fixed axis range
-        "nice": false,
-        "clamp": true
-      },
-      "axis": {
-        "values": [0,1,2,3,4,5,6,7,8,9,10],
-        "tickCount": 11
-      }
+      "scale": { "domain": [0, 10], "nice": false, "clamp": true },
+      "axis": { "values": [0,1,2,3,4,5,6,7,8,9,10], "tickCount": 11 }
     },
     "tooltip": [
       { "field": "Location", "type": "nominal" },
@@ -212,6 +205,7 @@
   </script>
 </body>
 </html>
+
 
 
 
