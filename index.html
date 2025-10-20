@@ -177,13 +177,14 @@
 
 
   <!-- Map spec -->
+<!-- Map spec: now with a reactive year slider -->
 <script type="application/json" id="spec-map">
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "width": 900,
   "height": 520,
-  "title": "Rainfall by State",
-  "projection": { "type": "mercator" },
+  "title": {"text": "Rainfall by State", "anchor": "start"},
+  "projection": {"type": "mercator"},
 
   "params": [
     { "name": "map_year",
@@ -199,13 +200,14 @@
 
   "transform": [
     {
-      "calculate": "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
+      "calculate":
+        "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
       "as": "abbr"
     },
     {
       "lookup": "abbr",
       "from": {
-        "data": { "url": "rainfall_by_state.csv", "format": { "type": "csv" } },
+        "data": { "url": "rainfall_by_state.csv", "format": {"type":"csv"} },
         "transform": [
           { "calculate": "toNumber(datum.Year)", "as": "Y" },
           { "filter": "datum.Y == map_year" }
@@ -234,7 +236,6 @@
 </script>
 
 
-
   <!-- ============ Embed helper ============ -->
   <script>
     function embedFromTag(target, tagId) {
@@ -251,6 +252,7 @@
   </script>
 </body>
 </html>
+
 
 
 
