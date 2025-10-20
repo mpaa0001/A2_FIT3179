@@ -182,12 +182,21 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "width": 900,
   "height": 520,
-  "title": "Rainfall by State — 2017",
+  "title": "Rainfall by State",
   "projection": { "type": "mercator" },
+
+  "params": [
+    { "name": "map_year",
+      "value": 2017,
+      "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
+    }
+  ],
+
   "data": {
     "url": "AUS_states.json",
     "format": { "type": "topojson", "feature": "AUS_states" }
   },
+
   "transform": [
     {
       "calculate": "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
@@ -199,14 +208,16 @@
         "data": { "url": "rainfall_by_state.csv", "format": { "type": "csv" } },
         "transform": [
           { "calculate": "toNumber(datum.Year)", "as": "Y" },
-          { "filter": "datum.Y == 2017" }
+          { "filter": "datum.Y == map_year" }
         ],
         "key": "State",
         "fields": ["rain_mm"]
       }
     }
   ],
+
   "mark": { "type": "geoshape", "stroke": "white" },
+
   "encoding": {
     "color": {
       "field": "rain_mm",
@@ -221,6 +232,7 @@
   }
 }
 </script>
+
 
 
   <!-- ============ Embed helper ============ -->
@@ -239,6 +251,7 @@
   </script>
 </body>
 </html>
+
 
 
 
