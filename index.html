@@ -177,7 +177,7 @@
 
 
   <!-- Map spec -->
- <script type="application/json" id="spec-map">
+<script type="application/json" id="spec-map">
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "width": 900,
@@ -196,7 +196,7 @@
     {
       "lookup": "abbr",
       "from": {
-        "data": { "url": "rainfall_by_state.csv" },
+        "data": { "url": "rainfall_by_state.csv", "format": { "type": "csv" } },
         "transform": [
           { "calculate": "toNumber(datum.Year)", "as": "Y" },
           { "filter": "datum.Y == 2017" }
@@ -214,13 +214,13 @@
       "title": "Avg rainfall (mm)",
       "scale": { "scheme": "blues" }
     },
-     "tooltip": [
-    { "field": "abbr", "type": "nominal", "title": "STATE" },
-    { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)" }
-  ]
+    "tooltip": [
+      { "field": "abbr", "type": "nominal", "title": "STATE" },
+      { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)" }
+    ]
+  }
 }
 </script>
-
 
 
   <!-- ============ Embed helper ============ -->
@@ -239,6 +239,7 @@
   </script>
 </body>
 </html>
+
 
 
 
