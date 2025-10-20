@@ -133,15 +133,12 @@
       "type": "quantitative",
       "title": "Avg rainfall (mm)",
       "scale": {
-        "domain": [0, 10],      /* fixed domain */
-        "domainMin": 0,         /* extra guard */
-        "domainMax": 10,        /* extra guard */
-        "nice": false,          /* prevent auto 'nice' rounding */
-        "clamp": true,          /* clip if any bar tries to exceed max */
-        "zero": true
+        "domain": [0, 10],     // <- fixed axis range
+        "nice": false,
+        "clamp": true
       },
       "axis": {
-        "values": [0,1,2,3,4,5,6,7,8,9,10],  /* consistent ticks */
+        "values": [0,1,2,3,4,5,6,7,8,9,10],
         "tickCount": 11
       }
     },
@@ -215,5 +212,6 @@
   </script>
 </body>
 </html>
+
 
 
