@@ -193,25 +193,26 @@
     }
   ],
 
+  /* 1) Base layer is the TopoJSON geometry */
   "data": {
     "url": "AUS_states.json",
     "format": { "type": "topojson", "feature": "AUS_states" }
   },
 
   "transform": [
-    /* Get a consistent full state name from the TopoJSON (handles different files) */
+    /* Robustly grab the full state name from whichever property exists */
     {
       "calculate":
         "(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))",
       "as": "STATE_NAME"
     },
-    /* Map full names -> abbreviations used in the CSV */
+    /* Map full names -> abbreviations used by the CSV */
     {
       "calculate":
         "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[datum.STATE_NAME]",
       "as": "abbr"
     },
-    /* Join rainfall for the selected year (filter INSIDE the lookup!) */
+    /* 2) Join rainfall for the selected year (filter INSIDE the lookup) */
     {
       "lookup": "abbr",
       "from": {
@@ -222,8 +223,9 @@
         ],
         "key": "State",
         "fields": ["rain_mm"]
-      },
-      "as": "rain_mm"
+      }
+      /* NOTE: no "as" needed since we keep the CSV field name "rain_mm" */
+      /* If you prefer to rename, use: "as": ["rain_mm"] */
     }
   ],
 
@@ -246,6 +248,7 @@
 
 
 
+
   <!-- ============ Embed helper ============ -->
   <script>
     function embedFromTag(target, tagId) {
@@ -262,6 +265,7 @@
   </script>
 </body>
 </html>
+
 
 
 
