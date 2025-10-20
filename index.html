@@ -14,36 +14,45 @@
     /* simple header centering */
     h1, p.header-sub { text-align:center; margin: 0.25rem 0 1rem; }
 
-    /* ===== Layout for the trend chart + notes ===== */
-    .trend-row{
-      display:flex;
-      gap:16px;
-      align-items:flex-start;          /* TOP-align both cells */
-    }
-    .trend-chart{
-      flex:1 1 auto;                   /* chart grows to fill space */
-      min-width:640px;                 /* keep room for notes when wide */
-      min-height:320px;
+    /* shared offsets for aligning note boxes with plot areas (not chart titles) */
+    :root {
+      --trend-title-offset: 36px;
+      --toploc-title-offset: 36px;
     }
 
-    /* Nudge notes down to align visually with the plot area (not the chart title) */
-    :root { --trend-title-offset: 36px; }   /* adjust if needed */
+    /* ===== Layout for the trend chart + notes ===== */
+    .trend-row{
+      display:flex; gap:16px; align-items:flex-start;
+    }
+    .trend-chart{
+      flex:1 1 auto; min-width:640px; min-height:320px;
+    }
     .trend-notes{
-      flex:0 0 360px;                  /* fixed width column on the right */
-      align-self:flex-start;           /* pin notes to the top */
+      flex:0 0 360px; align-self:flex-start;
       margin-top: var(--trend-title-offset);
-      border:1px solid #e5e7eb;
-      border-radius:8px;
-      padding:10px 12px;
-      background:#fff;
-      line-height:1.35;
+      border:1px solid #e5e7eb; border-radius:8px;
+      padding:10px 12px; background:#fff; line-height:1.35;
+    }
+
+    /* ===== Layout for the top-10 chart + notes ===== */
+    .toploc-row{
+      display:flex; gap:16px; align-items:flex-start;
+    }
+    .toploc-chart{
+      flex:1 1 auto; min-width:640px; min-height:420px;
+    }
+    .toploc-notes{
+      flex:0 0 360px; align-self:flex-start;
+      margin-top: var(--toploc-title-offset);
+      border:1px solid #e5e7eb; border-radius:8px;
+      padding:10px 12px; background:#fff; line-height:1.35;
     }
 
     /* Stack on small screens */
     @media (max-width: 900px){
-      .trend-row{ flex-direction:column; }
-      .trend-chart{ min-width:0; }
-      .trend-notes{ margin-top: 8px; }  /* reset when stacked */
+      .trend-row, .toploc-row{ flex-direction:column; }
+      .trend-chart, .toploc-chart{ min-width:0; }
+      .trend-notes, .toploc-notes{ margin-top:8px; }
     }
   </style>
 </head>
@@ -55,7 +64,6 @@
   <h2>National Annual Rainfall</h2>
   <section class="trend-row">
     <div id="trend" class="trend-chart"></div>
-
     <aside class="trend-notes">
       <ul style="margin:0; padding-left:1rem;">
         <li><strong>Wettest period:</strong> 2010–2011 sits clearly above the mean, indicating an unusually wet couple of years.</li>
@@ -65,8 +73,18 @@
     </aside>
   </section>
 
+  <!-- ===== Top 10 chart (chart left, notes right) ===== -->
   <h2>Top 10 Locations (by year)</h2>
-  <div id="toploc"></div>
+  <section class="toploc-row">
+    <div id="toploc" class="toploc-chart"></div>
+    <aside class="toploc-notes">
+      <ul style="margin:0; padding-left:1rem;">
+        <li><strong>Cairns & Coffs Harbour lead often;</strong> <em>Darwin</em> surges to #1 in 2017 with the decade’s peak.</li>
+        <li><strong>Tropical/east-coast hubs dominate</strong> (Cairns, Darwin, Townsville, Coffs Harbour, Gold Coast, Sydney/Wollongong/Newcastle); inland/southern sites are rare.</li>
+        <li><strong>Year-to-year swings:</strong> strong around 2010–11, softer 2014–16, then a sharp rebound in 2017.</li>
+      </ul>
+    </aside>
+  </section>
 
   <h2>Rainfall by State (Choropleth)</h2>
   <div id="map"></div>
@@ -80,7 +98,7 @@
     "width": 900,
     "height": 320,
     "title": { "text": "Average Annual Rainfall — Australia (2008–2017)", "anchor": "start", "offset": 6 },
-    "data": { "url": "rainfall_timeseries.csv?v=1" },
+    "data": { "url": "rainfall_timeseries.csv" },
     "transform": [{ "filter": "datum.Year >= 2008 && datum.Year <= 2017" }],
     "layer": [
       {
@@ -103,7 +121,7 @@
   }
   </script>
 
-  <!-- Top locations spec -->
+  <!-- Top locations spec (fixed x-axis 0–10) -->
   <script type="application/json" id="spec-toploc">
   {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -111,13 +129,10 @@
     "height": 420,
     "title": "Top 10 Locations by Average Rainfall",
     "params": [
-      {
-        "name": "year_sel",
-        "value": 2017,
-        "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
-      }
+      { "name": "year_sel", "value": 2017,
+        "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 } }
     ],
-    "data": { "url": "rainfall_by_location.csv?v=1" },
+    "data": { "url": "rainfall_by_location.csv" },
     "transform": [
       { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
       { "filter": "datum.YearNum == year_sel" },
@@ -149,22 +164,17 @@
     "width": 900,
     "height": 500,
     "title": "Rainfall by State — 2017",
-    "data": {
-      "url": "AUS_states.json?v=1",
-      "format": { "type": "topojson", "feature": "AUS_states" }
-    },
+    "data": { "url": "AUS_states.json", "format": { "type": "topojson", "feature": "AUS_states" } },
     "transform": [
       {
-        "calculate": "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
+        "calculate":
+          "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
         "as": "abbr"
       },
       {
         "lookup": "abbr",
         "from": {
-          "data": {
-            "url": "rainfall_by_state.csv?v=1",
-            "format": { "type": "csv" }
-          },
+          "data": { "url": "rainfall_by_state.csv", "format": { "type": "csv" } },
           "transform": [
             { "calculate": "toNumber(datum.Year)", "as": "Y" },
             { "filter": "datum.Y == 2017" }
@@ -187,22 +197,14 @@
   }
   </script>
 
-  <!-- ============ Embed helper (shows errors) ============ -->
+  <!-- ============ Embed helper ============ -->
   <script>
     function embedFromTag(target, tagId) {
-      const el = document.querySelector(target);
       try {
         const spec = JSON.parse(document.getElementById(tagId).textContent);
-        vegaEmbed(target, spec, { actions: false })
-          .catch(err => {
-            console.error('Embed error for', tagId, err);
-            el.innerHTML = '<pre style="color:#b91c1c;background:#fee;text-wrap:wrap;padding:.5rem;border:1px solid #fca5a5;border-radius:6px;">'
-              + String(err) + '</pre>';
-          });
+        return vegaEmbed(target, spec, { actions: false });
       } catch (e) {
-        console.error(`Failed to parse ${tagId}:`, e);
-        el.innerHTML = '<pre style="color:#b91c1c;background:#fee;padding:.5rem;border:1px solid #fca5a5;border-radius:6px;">'
-          + 'JSON parse error in ' + tagId + ':\n' + String(e) + '</pre>';
+        console.error(`Failed to load ${tagId}:`, e);
       }
     }
     embedFromTag('#trend',  'spec-trend');
@@ -211,4 +213,3 @@
   </script>
 </body>
 </html>
-
