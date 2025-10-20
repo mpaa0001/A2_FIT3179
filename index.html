@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,15 +18,12 @@
     :root {
       --trend-title-offset: 36px;
       --toploc-title-offset: 36px;
+      --map-title-offset: 36px; /* NEW */
     }
 
     /* ===== trend chart + notes ===== */
-    .trend-row{
-      display:flex; gap:16px; align-items:flex-start;
-    }
-    .trend-chart{
-      flex:1 1 auto; min-width:640px; min-height:320px;
-    }
+    .trend-row{ display:flex; gap:16px; align-items:flex-start; }
+    .trend-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
     .trend-notes{
       flex:0 0 360px; align-self:flex-start;
       margin-top: var(--trend-title-offset);
@@ -36,12 +32,8 @@
     }
 
     /* =====  top-10 chart + notes ===== */
-    .toploc-row{
-      display:flex; gap:16px; align-items:flex-start;
-    }
-    .toploc-chart{
-      flex:1 1 auto; min-width:640px; min-height:420px;
-    }
+    .toploc-row{ display:flex; gap:16px; align-items:flex-start; }
+    .toploc-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
     .toploc-notes{
       flex:0 0 360px; align-self:flex-start;
       margin-top: var(--toploc-title-offset);
@@ -49,11 +41,21 @@
       padding:10px 12px; background:#fff; line-height:1.35;
     }
 
+    /* ===== map + notes (NEW) ===== */
+    .map-row{ display:flex; gap:16px; align-items:flex-start; }
+    .map-chart{ flex:1 1 auto; min-width:640px; min-height:520px; }
+    .map-notes{
+      flex:0 0 360px; align-self:flex-start;
+      margin-top: var(--map-title-offset);
+      border:1px solid #e5e7eb; border-radius:8px;
+      padding:10px 12px; background:#fff; line-height:1.35;
+    }
+
     /* Stack on small screens */
     @media (max-width: 900px){
-      .trend-row, .toploc-row{ flex-direction:column; }
-      .trend-chart, .toploc-chart{ min-width:0; }
-      .trend-notes, .toploc-notes{ margin-top:8px; }
+      .trend-row, .toploc-row, .map-row{ flex-direction:column; }
+      .trend-chart, .toploc-chart, .map-chart{ min-width:0; }
+      .trend-notes, .toploc-notes, .map-notes{ margin-top:8px; }
     }
   </style>
 </head>
@@ -87,8 +89,18 @@
     </aside>
   </section>
 
+  <!-- ===== Choropleth + notes ===== -->
   <h2>Rainfall by State (Choropleth)</h2>
-  <div id="map"></div>
+  <section class="map-row">
+    <div id="map" class="map-chart"></div>
+    <aside class="map-notes">
+      <ul style="margin:0; padding-left:1rem;">
+        <li><strong>Top-end stays wettest:</strong> Northern Territory and Queensland dominate state averages most years, with standout peaks in QLD ~5.74&nbsp;mm (2010) and NT ~5.70&nbsp;mm (2017) well above other states.</li>
+        <li><strong>South/temperate states are driest:</strong> SA, TAS, VIC and ACT mostly sit around ~1–2&nbsp;mm; lows include SA ~0.98&nbsp;mm (2015) and ACT ~1.05&nbsp;mm (2017).</li>
+        <li><strong>Clear year-to-year swings:</strong> Broad spike 2010–11 (especially QLD/NT), a trough around 2014–15 across many states (e.g., NSW ~2.30&nbsp;mm in 2014, SA ~0.98&nbsp;mm in 2015), then a rebound by 2016–17 capped by NT’s 2017 high.</li>
+      </ul>
+    </aside>
+  </section>
 
   <!-- ============ Vega-Lite specs ============ -->
 
@@ -122,62 +134,58 @@
   }
   </script>
 
-  <!-- Top locations spec (fixed x-axis 0–10) -->
- <script type="application/json" id="spec-toploc">
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 800,
-  "height": 420,
-  "title": "Top 10 Locations by Average Rainfall",
-  "params": [
-    {
-      "name": "year_sel",
-      "value": 2017,
-      "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
+  <!-- Top locations spec -->
+  <script type="application/json" id="spec-toploc">
+  {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "width": 800,
+    "height": 420,
+    "title": "Top 10 Locations by Average Rainfall",
+    "params": [
+      { "name": "year_sel", "value": 2017,
+        "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 } }
+    ],
+    "data": { "url": "rainfall_by_location.csv" },
+    "transform": [
+      { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
+      { "filter": "datum.YearNum == year_sel" },
+      { "window": [ { "op": "rank", "as": "rank" } ], "sort": [ { "field": "rain_mm", "order": "descending" } ] },
+      { "filter": "datum.rank <= 10" }
+    ],
+    "mark": "bar",
+    "encoding": {
+      "y": { "field": "Location", "type": "nominal", "sort": "-x", "title": null },
+      "x": {
+        "field": "rain_mm",
+        "type": "quantitative",
+        "title": "Avg rainfall (mm)",
+        "scale": { "domain": [0, 10], "nice": false, "clamp": true },
+        "axis": { "values": [0,1,2,3,4,5,6,7,8,9,10], "tickCount": 11 }
+      },
+      "color": {
+        "field": "Location",
+        "type": "nominal",
+        "legend": {"title": "Location"},
+        "scale": {
+          "domain": [
+            "Cairns","CoffsHarbour","Darwin","Townsville","GoldCoast",
+            "MountGambier","Tuggeranong","Wollongong","Brisbane","MountGinini",
+            "Sydney","Katherine","NorahHead","Newcastle","Williamtown",
+            "Walpole","Witchcliffe","NorfolkIsland","SydneyAirport"
+          ],
+          "scheme": "tableau20"
+        }
+      },
+      "tooltip": [
+        { "field": "Location", "type": "nominal" },
+        { "field": "rain_mm", "type": "quantitative", "format": ".1f", "title": "Avg (mm)" }
+      ]
     }
-  ],
-  "data": { "url": "rainfall_by_location.csv" },
-  "transform": [
-    { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
-    { "filter": "datum.YearNum == year_sel" },
-    { "window": [ { "op": "rank", "as": "rank" } ], "sort": [ { "field": "rain_mm", "order": "descending" } ] },
-    { "filter": "datum.rank <= 10" }
-  ],
-  "mark": "bar",
-  "encoding": {
-    "y": { "field": "Location", "type": "nominal", "sort": "-x", "title": null },
-    "x": {
-      "field": "rain_mm",
-      "type": "quantitative",
-      "title": "Avg rainfall (mm)",
-      "scale": { "domain": [0, 10], "nice": false, "clamp": true },
-      "axis": { "values": [0,1,2,3,4,5,6,7,8,9,10], "tickCount": 11 }
-    },
-    "color": {
-      "field": "Location",
-      "type": "nominal",
-      "legend": {"title": "Location"},
-      "scale": {
-        "domain": [
-          "Cairns","CoffsHarbour","Darwin","Townsville","GoldCoast",
-          "MountGambier","Tuggeranong","Wollongong","Brisbane","MountGinini",
-          "Sydney","Katherine","NorahHead","Newcastle","Williamtown",
-          "Walpole","Witchcliffe","NorfolkIsland","SydneyAirport"
-        ],
-        "scheme": "tableau20"
-      }
-    },
-    "tooltip": [
-      { "field": "Location", "type": "nominal" },
-      { "field": "rain_mm", "type": "quantitative", "format": ".1f", "title": "Avg (mm)" }
-    ]
   }
-}
-</script>
+  </script>
 
-
-  <!-- Map spec -->
- <script type="application/json" id="spec-map">
+  <!-- Map spec (unchanged logic; just the surrounding layout is new) -->
+  <script type="application/json" id="spec-map">
   {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
     "width": 900,
@@ -216,11 +224,6 @@
   }
   </script>
 
-
-
-
-
-
   <!-- ============ Embed helper ============ -->
   <script>
     function embedFromTag(target, tagId) {
@@ -237,20 +240,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
