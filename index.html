@@ -11,30 +11,34 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 18px; }
-    h1, p.header-sub { text-align: center; margin: 0.25rem 0 1rem; }
+    /* simple header centering */
+    h1, p.header-sub { text-align:center; margin: 0.25rem 0 1rem; }
 
-    /* ---- Trend row: chart left, notes right ---- */
+    /* ===== Layout for the trend chart + notes ===== */
     .trend-row{
       display:flex;
       gap:16px;
-      align-items:flex-start;      /* top-align both */
-      margin-bottom: 24px;
+      align-items:flex-start;          
     }
     .trend-chart{
-      flex:1 1 auto;               /* chart grows */
-      min-width:640px;             /* keep room for notes on wide screens */
+      flex:1 1 auto;                   /* chart grows to fill space */
+      min-width:640px;                 /* keep room for notes when wide */
       min-height:320px;
     }
     .trend-notes{
-      flex:0 0 360px;              /* fixed notes column */
-      border:1px solid #e5e7eb; border-radius:8px;
-      padding:10px 12px; background:#fff; line-height:1.35;
+      flex:0 0 360px;                  /* fixed width column on the right */
+      align-self:flex-start;           /* pin notes to the top */
+      border:1px solid #e5e7eb;
+      border-radius:8px;
+      padding:10px 12px;
+      background:#fff;
+      line-height:1.35;
+      margin-top:0;
     }
-
+    /* Stack on small screens */
     @media (max-width: 900px){
-      .trend-row{ flex-direction: column; }
-      .trend-chart{ min-width: 0; }
+      .trend-row{ flex-direction:column; }
+      .trend-chart{ min-width:0; }
     }
   </style>
 </head>
@@ -42,13 +46,12 @@
   <h1>Rainfall Patterns in Australia</h1>
   <p class="header-sub"><strong>Melanie Paaris 33116121</strong></p>
 
-  <!-- ===== National Annual Rainfall (chart + notes) ===== -->
+  <!-- ===== National Annual Rainfall (chart left, notes right) ===== -->
   <h2>National Annual Rainfall</h2>
   <section class="trend-row">
-    <!-- SINGLE trend chart container (keep this id unique) -->
+    
     <div id="trend" class="trend-chart"></div>
 
-    <!-- Notes pinned to the right of the chart -->
     <aside class="trend-notes">
       <ul style="margin:0; padding-left:1rem;">
         <li><strong>Wettest period:</strong> 2010–2011 sits clearly above the mean, indicating an unusually wet couple of years.</li>
@@ -58,22 +61,19 @@
     </aside>
   </section>
 
-  <!-- ===== Top 10 Locations ===== -->
   <h2>Top 10 Locations (by year)</h2>
   <div id="toploc"></div>
 
-  <!-- ===== Map ===== -->
   <h2>Rainfall by State (Choropleth)</h2>
   <div id="map"></div>
 
-  <!-- =================== Vega-Lite SPECS =================== -->
+  <!-- ============ Vega-Lite specs ============ -->
 
-  <!-- Trend with mean line -->
+  <!-- Trend spec -->
   <script type="application/json" id="spec-trend">
   {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "autosize": { "type": "fit", "contains": "padding" },
-    "width": "container",
+    "width": 900,
     "height": 320,
     "title": "Average Annual Rainfall — Australia (2008–2017)",
     "data": { "url": "rainfall_timeseries.csv" },
@@ -98,102 +98,5 @@
     ]
   }
   </script>
-
-
-
-  <!-- Top locations with slider -->
-  <script type="application/json" id="spec-toploc">
-  {
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "width": 800,
-    "height": 420,
-    "title": "Top 10 Locations by Average Rainfall",
-    "params": [
-      { "name": "year_sel", "value": 2017, "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 } }
-    ],
-    "data": { "url": "rainfall_by_location.csv" },
-    "transform": [
-      { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
-      { "filter": "datum.YearNum == year_sel" },
-      { "window": [ { "op": "rank", "as": "rank" } ], "sort": [ { "field": "rain_mm", "order": "descending" } ] },
-      { "filter": "datum.rank <= 10" }
-    ],
-    "mark": "bar",
-    "encoding": {
-      "y": { "field": "Location", "type": "nominal", "sort": "-x", "title": null },
-      "x": { "field": "rain_mm", "type": "quantitative", "title": "Avg rainfall (mm)" },
-      "tooltip": [
-        { "field": "Location", "type": "nominal" },
-        { "field": "rain_mm", "type": "quantitative", "format": ".1f", "title": "Avg (mm)" }
-      ]
-    }
-  }
-  </script>
-
-  <!-- Map (joins by state abbreviation; filters Year=2017 from rainfall_by_state.csv) -->
-  <script type="application/json" id="spec-map">
-  {
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "width": 900,
-    "height": 500,
-    "title": "Rainfall by State — 2017",
-    "data": {
-      "url": "AUS_states.json",
-      "format": { "type": "topojson", "feature": "AUS_states" }
-    },
-    "transform": [
-      {
-        "calculate": "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
-        "as": "abbr"
-      },
-      {
-        "lookup": "abbr",
-        "from": {
-          "data": {
-            "url": "rainfall_by_state.csv",
-            "format": { "type": "csv" }
-          },
-          "transform": [
-            { "calculate": "toNumber(datum.Year)", "as": "Y" },
-            { "filter": "datum.Y == 2017" }
-          ],
-          "key": "State",
-          "fields": ["rain_mm"]
-        }
-      }
-    ],
-    "projection": { "type": "equalEarth" },
-    "mark": { "type": "geoshape", "stroke": "white" },
-    "encoding": {
-      "color": { "field": "rain_mm", "type": "quantitative", "title": "Avg rainfall (mm)", "scale": { "scheme": "blues" } },
-      "tooltip": [
-        { "field": "properties.STATE_NAME", "type": "nominal", "title": "State" },
-        { "field": "abbr", "type": "nominal", "title": "Code" },
-        { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "Avg (mm)" }
-      ]
-    }
-  }
-  </script>
-
-  <script>
-    function embedFromTag(target, tagId) {
-      try {
-        const spec = JSON.parse(document.getElementById(tagId).textContent);
-        return vegaEmbed(target, spec, { actions: false });
-      } catch (e) {
-        console.error(`Failed to load ${tagId}:`, e);
-      }
-    }
-    embedFromTag('#trend',  'spec-trend');
-    embedFromTag('#toploc', 'spec-toploc');
-    embedFromTag('#map',    'spec-map');
-  </script>
-</body>
-</html>
-
-
-
-
-
 
 
