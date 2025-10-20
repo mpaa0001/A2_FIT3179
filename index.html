@@ -177,17 +177,17 @@
 
 
   <!-- Map spec -->
-<!-- Map spec: now with a reactive year slider -->
 <script type="application/json" id="spec-map">
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "width": 900,
   "height": 520,
-  "title": {"text": "Rainfall by State", "anchor": "start"},
-  "projection": {"type": "mercator"},
+  "title": "Rainfall by State",
+  "projection": { "type": "mercator" },
 
   "params": [
-    { "name": "map_year",
+    {
+      "name": "mapYear",
       "value": 2017,
       "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
     }
@@ -207,10 +207,13 @@
     {
       "lookup": "abbr",
       "from": {
-        "data": { "url": "rainfall_by_state.csv", "format": {"type":"csv"} },
+        "data": {
+          "url": "rainfall_by_state.csv",
+          "format": { "type": "csv" }
+        },
         "transform": [
-          { "calculate": "toNumber(datum.Year)", "as": "Y" },
-          { "filter": "datum.Y == map_year" }
+          { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
+          { "filter": "datum.YearNum == mapYear" }
         ],
         "key": "State",
         "fields": ["rain_mm"]
@@ -252,6 +255,7 @@
   </script>
 </body>
 </html>
+
 
 
 
