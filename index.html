@@ -258,37 +258,41 @@
     "url": "weatherAUS.csv",
     "format": {
       "type": "csv",
-      "parse": {
-        "Date": "date",
-        "Rainfall": "number",
-        "MaxTemp": "number"
-      }
+      "parse": { "Date": "date", "Rainfall": "number", "MaxTemp": "number" }
     }
   },
   "transform": [
-    { "calculate": "year(datum.Date)",  "as": "Year" },
-    { "calculate": "month(datum.Date)", "as": "Month" },
-    { "filter": "datum.Year >= 2008 && datum.Year <= 2017" },
+    { "filter": "isValid(datum.Rainfall) && isFinite(datum.Rainfall) && isValid(datum.MaxTemp) && isFinite(datum.MaxTemp)" },
+
+    { "timeUnit": "yearmonth", "field": "Date", "as": "YM" },
+    { "timeUnit": "year",       "field": "Date", "as": "Year" },
+
     {
       "aggregate": [
         { "op": "mean", "field": "Rainfall", "as": "r_mm" },
-        { "op": "mean", "field": "MaxTemp", "as": "t_c" }
+        { "op": "mean", "field": "MaxTemp",  "as": "t_c" }
       ],
-      "groupby": ["Year","Month"]
+      "groupby": ["YM","Year"]
     },
+
+    { "filter": "year(datum.YM) >= 2008 && year(datum.YM) <= 2017" },
+
     { "filter": "isFinite(datum.r_mm) && isFinite(datum.t_c)" }
   ],
+
   "layer": [
     {
       "mark": { "type": "point", "filled": true, "opacity": 0.6, "size": 60 },
       "encoding": {
         "x": { "field": "t_c", "type": "quantitative", "title": "Avg temperature (°C)" },
         "y": { "field": "r_mm", "type": "quantitative", "title": "Avg rainfall (mm)" },
-        "color": { "field": "Year", "type": "ordinal", "legend": {"title": "Year"}, "scale": {"scheme": "plasma"} },
+        "color": {
+          "field": "Year", "type": "ordinal",
+          "legend": {"title": "Year"}, "scale": {"scheme": "plasma"}
+        },
         "tooltip": [
           { "field": "Year", "type": "quantitative" },
-          { "field": "Month", "type": "quantitative" },
-          { "field": "t_c", "type": "quantitative", "format": ".1f", "title": "Temp (°C)" },
+          { "field": "t_c",  "type": "quantitative", "format": ".1f", "title": "Temp (°C)" },
           { "field": "r_mm", "type": "quantitative", "format": ".2f", "title": "Rain (mm)" }
         ]
       }
@@ -300,6 +304,7 @@
   ]
 }
 </script>
+
 
   <!-- Seasonality -->
   <script type="application/json" id="spec-seasonality">{
@@ -338,6 +343,7 @@
   </script>
 </body>
 </html>
+
 
 
 
