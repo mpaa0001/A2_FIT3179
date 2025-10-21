@@ -225,36 +225,34 @@
     }
   ],
 
-  "data": { "url": "rainfall_by_state.csv" },
+  "data": {
+    "url": "AUS_states.json",
+    "format": { "type": "topojson", "feature": "AUS_states" }
+  },
 
   "transform": [
-    { "calculate": "toNumber(datum.Year)", "as": "Y" },
-    { "filter": "datum.Y == mapYear" },
-
     {
       "calculate":
-        "({'NSW':'New South Wales','NT':'Northern Territory','QLD':'Queensland','SA':'South Australia','TAS':'Tasmania','VIC':'Victoria','WA':'Western Australia','ACT':'Australian Capital Territory'})[datum.State]",
-      "as": "STATE_NAME"
+        "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
+      "as": "abbr"
     },
-
     {
-      "lookup": "STATE_NAME",
+      "lookup": "abbr",
       "from": {
-        "data": {
-          "url": "AUS_states.json",
-          "format": { "type": "topojson", "feature": "AUS_states" }
-        },
-        "key": "properties.STATE_NAME",
-        "fields": ["type","properties","geometry"]
-      },
-      "as": "feature"
+        "data": { "url": "rainfall_by_state.csv" },
+        "transform": [
+          { "calculate": "toNumber(datum.Year)", "as": "Y" },
+          { "filter": "datum.Y == mapYear" }
+        ],
+        "key": "State",
+        "fields": ["rain_mm"]
+      }
     }
   ],
 
   "mark": { "type": "geoshape", "stroke": "white" },
 
   "encoding": {
-    "shape": { "field": "feature", "type": "geojson" },
     "color": {
       "field": "rain_mm",
       "type": "quantitative",
@@ -262,8 +260,13 @@
       "scale": { "scheme": "blues" }
     },
     "tooltip": [
-      { "field": "State", "type": "nominal", "title": "STATE" },
-      { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)" }
+      {
+        "field": "properties.STATE_NAME",
+        "type": "nominal",
+        "title": "State"
+      },
+      { "field": "abbr", "type": "nominal", "title": "Code" },
+      { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "Avg (mm)" }
     ]
   }
 }
@@ -349,6 +352,7 @@
   </script>
 </body>
 </html>
+
 
 
 
