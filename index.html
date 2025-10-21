@@ -62,6 +62,26 @@
       padding:10px 12px; background:#fff; line-height:1.35;
     }
 
+
+  <style>
+  /* ===== monthly seasonality ===== */
+  .season-row{ display:flex; gap:16px; align-items:flex-start; }
+  .season-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
+  .season-notes{
+    flex:0 0 360px; align-self:flex-start;
+    margin-top: 36px; border:1px solid #e5e7eb; border-radius:8px;
+    padding:10px 12px; background:#fff; line-height:1.35;
+  }
+  @media (max-width: 900px){
+    .season-row{ flex-direction:column; }
+    .season-chart{ min-width:0; }
+    .season-notes{ margin-top:8px; }
+  }
+</style>
+
+
+    
+
     /* Stack on small screens */
     @media (max-width: 900px){
       .trend-row, .toploc-row, .map-row, .scatter-row{ flex-direction:column; }
@@ -125,6 +145,9 @@
       </ul>
     </aside>
   </section>
+
+
+
 
   <!-- ============ Vega-Lite specs ============ -->
 
@@ -317,6 +340,36 @@
 }
 </script>
 
+<script type="application/json" id="spec-seasonality">
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 320,
+  "title": "Average Monthly Rainfall — Australia (2008–2017)",
+  "data": {
+    "url": "weatherAUS.csv",
+    "format": { "type": "csv", "parse": { "Date": "date", "Rainfall": "number" } }
+  },
+  "transform": [
+    { "filter": "isValid(datum.Rainfall) && isFinite(+datum.Rainfall)" },
+    { "calculate": "year(datum.Date)", "as": "Y" },
+    { "filter": "datum.Y >= 2008 && datum.Y <= 2017" }
+  ],
+  "encoding": {
+    "x": { "timeUnit": "month", "field": "Date", "title": null, "axis": { "format": "%b" } },
+    "y": { "aggregate": "mean", "field": "Rainfall", "title": "Avg rainfall (mm)" },
+    "tooltip": [
+      { "timeUnit": "month", "field": "Date", "title": "Month", "format": "%b" },
+      { "aggregate": "mean", "field": "Rainfall", "title": "Avg (mm)", "format": ".2f" }
+    ]
+  },
+  "layer": [
+    { "mark": { "type": "area", "opacity": 0.15 } },
+    { "mark": { "type": "line" } },
+    { "mark": { "type": "point" } }
+  ]
+}
+</script>
 
 
   <!-- ============ Embed helper ============ -->
@@ -333,9 +386,11 @@
     embedFromTag('#toploc',   'spec-toploc');
     embedFromTag('#map',      'spec-map');
     embedFromTag('#rainTemp', 'spec-rainTemp'); 
+    embedFromTag('#seasonality', 'spec-seasonality');
   </script>
 </body>
 </html>
+
 
 
 
