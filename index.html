@@ -275,25 +275,41 @@
 <script type="application/json" id="spec-rainTemp">
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 800,
+  "width": 900,
   "height": 420,
   "title": "Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
-  "data": {"url": "weatherAUS.csv"},
+  "data": {
+    "url": "weatherAUS.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "Date": "date",
+        "Rainfall": "number",
+        "MaxTemp": "number"
+      }
+    }
+  },
   "transform": [
-    {"calculate": "year(toDate(datum.Date))", "as": "Year"},
-    {"calculate": "month(toDate(datum.Date))", "as": "Month"},
+    /* keep only rows with both variables present */
+    {"filter": "isValid(datum.Rainfall) && isFinite(+datum.Rainfall) && isValid(datum.MaxTemp) && isFinite(+datum.MaxTemp)"},
+    /* derive calendar year & month */
+    {"calculate": "year(datum.Date)",  "as": "Year"},
+    {"calculate": "month(datum.Date)", "as": "Month"},
+    /* focus on your study window */
     {"filter": "datum.Year >= 2008 && datum.Year <= 2017"},
+    /* aggregate to monthly national averages (across all locations/days) */
     {
       "aggregate": [
         {"op": "mean", "field": "Rainfall", "as": "r_mm"},
-        {"op": "mean", "field": "MaxTemp", "as": "t_c"}
+        {"op": "mean", "field": "MaxTemp", "as": "t_c"},
+        {"op": "count", "as": "n"}
       ],
       "groupby": ["Year","Month"]
     }
   ],
   "layer": [
     {
-      "mark": {"type": "point", "filled": true, "opacity": 0.7},
+      "mark": {"type": "point", "filled": true, "opacity": 0.5, "size": 60},
       "encoding": {
         "x": {"field": "t_c", "type": "quantitative", "title": "Avg temperature (°C)"},
         "y": {"field": "r_mm", "type": "quantitative", "title": "Avg rainfall (mm)"},
@@ -301,21 +317,19 @@
           {"field": "Year", "type": "ordinal"},
           {"field": "Month", "type": "ordinal"},
           {"field": "t_c", "type": "quantitative", "format": ".1f", "title": "Temp (°C)"},
-          {"field": "r_mm", "type": "quantitative", "format": ".2f", "title": "Rain (mm)"}
+          {"field": "r_mm", "type": "quantitative", "format": ".2f", "title": "Rain (mm)"},
+          {"field": "n", "type": "quantitative", "title": "Rows in month"}
         ]
       }
     },
     {
       "transform": [{"regression": "r_mm", "on": "t_c"}],
-      "mark": {"type": "line", "strokeDash": [6,4]},
-      "encoding": {
-        "x": {"field": "t_c", "type": "quantitative"},
-        "y": {"field": "r_mm", "type": "quantitative"}
-      }
+      "mark": {"type": "line", "strokeDash": [6,4]}
     }
   ]
 }
 </script>
+
 
 
   <!-- ============ Embed helper ============ -->
@@ -335,5 +349,6 @@
   </script>
 </body>
 </html>
+
 
 
