@@ -248,31 +248,58 @@
     }}</script>
 
   <!-- Rainfall vs Temperature -->
-  <script type="application/json" id="spec-rainTemp">{
-    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
-    "width":900,"height":420,
-    "title":"Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
-    "data":{"url":"weatherAUS.csv","format":{"type":"csv"}},
-    "transform":[
-      {"calculate":"toDate(datum.Date)","as":"D"},
-      {"calculate":"year(datum.D)","as":"Year"},
-      {"calculate":"month(datum.D)","as":"Month"},
-      {"filter":"datum.Year >= 2008 && datum.Year <= 2017"},
-      {"aggregate":[{"op":"mean","field":"Rainfall","as":"r_mm"},{"op":"mean","field":"MaxTemp","as":"t_c"}],
-       "groupby":["Year","Month"]},
-      {"filter":"isFinite(datum.r_mm) && isFinite(datum.t_c)"}
-    ],
-    "layer":[
-      {"mark":{"type":"point","filled":true,"opacity":0.55,"size":60},
-       "encoding":{"x":{"field":"t_c","type":"quantitative","title":"Avg temperature (°C)"},
-                   "y":{"field":"r_mm","type":"quantitative","title":"Avg rainfall (mm)"},
-                   "color":{"field":"Year","type":"ordinal","legend":{"title":"Year"},"scale":{"scheme":"plasma"}},
-                   "tooltip":[{"field":"Year","type":"quantitative"},{"field":"Month","type":"quantitative"},
-                              {"field":"t_c","type":"quantitative","format":".1f","title":"Temp (°C)"},
-                              {"field":"r_mm","type":"quantitative","format":".2f","title":"Rain (mm)"}]}},
-      {"transform":[{"regression":"r_mm","on":"t_c"}],
-       "mark":{"type":"line","strokeDash":[6,4]}}
-    ]}</script>
+<script type="application/json" id="spec-rainTemp">
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 420,
+  "title": "Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
+  "data": {
+    "url": "weatherAUS.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "Date": "date",
+        "Rainfall": "number",
+        "MaxTemp": "number"
+      }
+    }
+  },
+  "transform": [
+    { "calculate": "year(datum.Date)",  "as": "Year" },
+    { "calculate": "month(datum.Date)", "as": "Month" },
+    { "filter": "datum.Year >= 2008 && datum.Year <= 2017" },
+    {
+      "aggregate": [
+        { "op": "mean", "field": "Rainfall", "as": "r_mm" },
+        { "op": "mean", "field": "MaxTemp", "as": "t_c" }
+      ],
+      "groupby": ["Year","Month"]
+    },
+    { "filter": "isFinite(datum.r_mm) && isFinite(datum.t_c)" }
+  ],
+  "layer": [
+    {
+      "mark": { "type": "point", "filled": true, "opacity": 0.6, "size": 60 },
+      "encoding": {
+        "x": { "field": "t_c", "type": "quantitative", "title": "Avg temperature (°C)" },
+        "y": { "field": "r_mm", "type": "quantitative", "title": "Avg rainfall (mm)" },
+        "color": { "field": "Year", "type": "ordinal", "legend": {"title": "Year"}, "scale": {"scheme": "plasma"} },
+        "tooltip": [
+          { "field": "Year", "type": "quantitative" },
+          { "field": "Month", "type": "quantitative" },
+          { "field": "t_c", "type": "quantitative", "format": ".1f", "title": "Temp (°C)" },
+          { "field": "r_mm", "type": "quantitative", "format": ".2f", "title": "Rain (mm)" }
+        ]
+      }
+    },
+    {
+      "transform": [ { "regression": "r_mm", "on": "t_c" } ],
+      "mark": { "type": "line", "strokeDash": [6,4] }
+    }
+  ]
+}
+</script>
 
   <!-- Seasonality -->
   <script type="application/json" id="spec-seasonality">{
@@ -311,6 +338,7 @@
   </script>
 </body>
 </html>
+
 
 
 
