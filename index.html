@@ -11,17 +11,18 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
   <style>
-    /* simple header centering */
+   
     h1, p.header-sub { text-align:center; margin: 0.25rem 0 1rem; }
 
-    /* shared offsets for aligning note boxes with plot areas (not chart titles) */
+    
     :root {
       --trend-title-offset: 36px;
       --toploc-title-offset: 36px;
-      --map-title-offset: 36px; /* NEW */
+      --map-title-offset: 36px;
+      --scatter-title-offset: 36px;
     }
 
-    /* ===== trend chart + notes ===== */
+    /* ===== trend chart ===== */
     .trend-row{ display:flex; gap:16px; align-items:flex-start; }
     .trend-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
     .trend-notes{
@@ -31,7 +32,7 @@
       padding:10px 12px; background:#fff; line-height:1.35;
     }
 
-    /* =====  top-10 chart + notes ===== */
+    /* =====  top-10 chart ===== */
     .toploc-row{ display:flex; gap:16px; align-items:flex-start; }
     .toploc-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
     .toploc-notes{
@@ -41,7 +42,7 @@
       padding:10px 12px; background:#fff; line-height:1.35;
     }
 
-    /* ===== map + notes (NEW) ===== */
+    /* ===== map ===== */
     .map-row{ display:flex; gap:16px; align-items:flex-start; }
     .map-chart{ flex:1 1 auto; min-width:640px; min-height:520px; }
     .map-notes{
@@ -51,11 +52,21 @@
       padding:10px 12px; background:#fff; line-height:1.35;
     }
 
+    /* ===== rainfall vs temperature (scatter)  ===== */
+    .scatter-row{ display:flex; gap:16px; align-items:flex-start; }
+    .scatter-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
+    .scatter-notes{
+      flex:0 0 360px; align-self:flex-start;
+      margin-top: var(--scatter-title-offset);
+      border:1px solid #e5e7eb; border-radius:8px;
+      padding:10px 12px; background:#fff; line-height:1.35;
+    }
+
     /* Stack on small screens */
     @media (max-width: 900px){
-      .trend-row, .toploc-row, .map-row{ flex-direction:column; }
-      .trend-chart, .toploc-chart, .map-chart{ min-width:0; }
-      .trend-notes, .toploc-notes, .map-notes{ margin-top:8px; }
+      .trend-row, .toploc-row, .map-row, .scatter-row{ flex-direction:column; }
+      .trend-chart, .toploc-chart, .map-chart, .scatter-chart{ min-width:0; }
+      .trend-notes, .toploc-notes, .map-notes, .scatter-notes{ margin-top:8px; }
     }
   </style>
 </head>
@@ -63,7 +74,7 @@
   <h1>Rainfall Patterns in Australia</h1>
   <p class="header-sub"><strong>Melanie Paaris 33116121</strong></p>
 
-  <!-- ===== National Annual Rainfall  ===== -->
+  <!-- ===== National Annual Rainfall ===== -->
   <h2>National Annual Rainfall</h2>
   <section class="trend-row">
     <div id="trend" class="trend-chart"></div>
@@ -76,7 +87,7 @@
     </aside>
   </section>
 
-  <!-- ===== Top 10 chart  ===== -->
+  <!-- ===== Top 10 Locations (by year) ===== -->
   <h2>Top 10 Locations (by year)</h2>
   <section class="toploc-row">
     <div id="toploc" class="toploc-chart"></div>
@@ -89,7 +100,7 @@
     </aside>
   </section>
 
-  <!-- ===== Choropleth + notes ===== -->
+  <!-- ===== Rainfall by State (Choropleth) ===== -->
   <h2>Rainfall by State (Choropleth)</h2>
   <section class="map-row">
     <div id="map" class="map-chart"></div>
@@ -97,7 +108,20 @@
       <ul style="margin:0; padding-left:1rem;">
         <li><strong>Top-end stays wettest:</strong> Northern Territory and Queensland dominate state averages most years, with standout peaks in QLD ~5.74&nbsp;mm (2010) and NT ~5.70&nbsp;mm (2017) well above other states.</li>
         <li><strong>South/temperate states are driest:</strong> SA, TAS, VIC and ACT mostly sit around ~1–2&nbsp;mm; lows include SA ~0.98&nbsp;mm (2015) and ACT ~1.05&nbsp;mm (2017).</li>
-        <li><strong>Clear year-to-year swings:</strong> Broad spike 2010–11 (especially QLD/NT), a trough around 2014–15 across many states (e.g., NSW ~2.30&nbsp;mm in 2014, SA ~0.98&nbsp;mm in 2015), then a rebound by 2016–17 capped by NT’s 2017 high.</li>
+        <li><strong>Clear year-to-year swings:</strong> Broad spike 2010–11 (especially QLD/NT), a trough around 2014–15 across many states, then a rebound by 2016–17.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- ===== Rainfall vs Temperature  ===== -->
+  <h2>Rainfall vs Temperature</h2>
+  <section class="scatter-row">
+    <div id="rainTemp" class="scatter-chart"></div>
+    <aside class="scatter-notes">
+      <ul style="margin:0; padding-left:1rem;">
+        <li><strong>Cooler months tend to be wetter:</strong> regression line slopes down, indicating higher rainfall at lower average max temps.</li>
+        <li><strong>Seasonality:</strong> points cluster into cooler-wetter vs hotter-drier months, complementing the yearly trend.</li>
+        <li><strong>Outliers:</strong> very wet, warm tropical months sit above the trend — highlighting the monsoonal north’s influence.</li>
       </ul>
     </aside>
   </section>
@@ -184,74 +208,106 @@
   }
   </script>
 
-  <!-- Map spec (unchanged logic; just the surrounding layout is new) -->
-<!-- Map spec: reactive year slider + upright Mercator -->
-<script type="application/json" id="spec-map">
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 900,
-  "height": 500,
-  "title": {"text": {"expr": "'Rainfall by State — ' + mapYear"}, "anchor": "start"},
-  "projection": { "type": "mercator" },
-
-  "params": [
-    {
-      "name": "mapYear",
-      "value": 2017,
-      "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
-    }
-  ],
-
-  /* PRIMARY data is the CSV (so the filter reacts to the slider) */
-  "data": { "url": "rainfall_by_state.csv" },
-
-  "transform": [
-    { "calculate": "toNumber(datum.Year)", "as": "Y" },
-    { "filter": "datum.Y == mapYear" },
-
-    /* Map state codes to full names to match the TopoJSON properties */
-    {
-      "calculate":
-        "({'NSW':'New South Wales','NT':'Northern Territory','QLD':'Queensland','SA':'South Australia','TAS':'Tasmania','VIC':'Victoria','WA':'Western Australia','ACT':'Australian Capital Territory'})[datum.State]",
-      "as": "STATE_NAME"
-    },
-
-    /* Look up the GeoJSON feature for each state */
-    {
-      "lookup": "STATE_NAME",
-      "from": {
-        "data": {
-          "url": "AUS_states.json",
-          "format": { "type": "topojson", "feature": "AUS_states" }
-        },
-        "key": "properties.STATE_NAME",
-        "fields": ["type","properties","geometry"]
+  <!-- Map spec -->
+  <script type="application/json" id="spec-map">
+  {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "width": 900,
+    "height": 500,
+    "title": {"text": {"expr": "'Rainfall by State — ' + mapYear"}, "anchor": "start"},
+    "projection": { "type": "mercator" },
+    "params": [
+      {
+        "name": "mapYear",
+        "value": 2017,
+        "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
+      }
+    ],
+    "data": { "url": "rainfall_by_state.csv" },
+    "transform": [
+      { "calculate": "toNumber(datum.Year)", "as": "Y" },
+      { "filter": "datum.Y == mapYear" },
+      {
+        "calculate":
+          "({'NSW':'New South Wales','NT':'Northern Territory','QLD':'Queensland','SA':'South Australia','TAS':'Tasmania','VIC':'Victoria','WA':'Western Australia','ACT':'Australian Capital Territory'})[datum.State]",
+        "as": "STATE_NAME"
       },
-      "as": "feature"
+      {
+        "lookup": "STATE_NAME",
+        "from": {
+          "data": {
+            "url": "AUS_states.json",
+            "format": { "type": "topojson", "feature": "AUS_states" }
+          },
+          "key": "properties.STATE_NAME",
+          "fields": ["type","properties","geometry"]
+        },
+        "as": "feature"
+      }
+    ],
+    "mark": { "type": "geoshape", "stroke": "white" },
+    "encoding": {
+      "shape": { "field": "feature", "type": "geojson" },
+      "color": {
+        "field": "rain_mm",
+        "type": "quantitative",
+        "title": "Avg rainfall (mm)",
+        "scale": { "scheme": "blues" }
+      },
+      "tooltip": [
+        { "field": "State", "type": "nominal", "title": "STATE" },
+        { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)" }
+      ]
     }
-  ],
+  }
+  </script>
 
-  "mark": { "type": "geoshape", "stroke": "white" },
-
-  "encoding": {
-    "shape": { "field": "feature", "type": "geojson" },
-    "color": {
-      "field": "rain_mm",
-      "type": "quantitative",
-      "title": "Avg rainfall (mm)",
-      "scale": { "scheme": "blues" }
-    },
-    "tooltip": [
-      { "field": "State", "type": "nominal", "title": "STATE" },
-      { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)" }
+  <!-- Rainfall vs Temperature spec Scatterplot-->
+  <script type="application/json" id="spec-rainTemp">
+  {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "width": 800,
+    "height": 420,
+    "title": "Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
+    "data": { "url": "weatherAUS.csv" },
+    "transform": [
+      { "calculate": "year(toDate(datum.Date))", "as": "Year" },
+      { "calculate": "month(toDate(datum.Date))", "as": "Month" },
+      { "filter": "datum.Year >= 2008 && datum.Year <= 2017" },
+      /* CHANGE FIELD NAMES IF NEEDED: Rainfall / MaxTemp */
+      {
+        "aggregate": [
+          { "op": "mean", "field": "Rainfall", "as": "r_mm" },
+          { "op": "mean", "field": "MaxTemp", "as": "t_c" }
+        ],
+        "groupby": ["Year","Month"]
+      }
+    ],
+    "layer": [
+      {
+        "mark": { "type": "point", "filled": true, "opacity": 0.7 },
+        "encoding": {
+          "x": { "field": "t_c", "type": "quantitative", "title": "Avg temperature (°C)" },
+          "y": { "field": "r_mm", "type": "quantitative", "title": "Avg rainfall (mm)" },
+          "tooltip": [
+            { "field": "Year", "type": "ordinal" },
+            { "field": "Month", "type": "ordinal" },
+            { "field": "t_c", "type": "quantitative", "format": ".1f", "title": "Temp (°C)" },
+            { "field": "r_mm", "type": "quantitative", "format": ".2f", "title": "Rain (mm)" }
+          ]
+        }
+      },
+      {
+        "transform": [{ "regression": "r_mm", "on": "t_c" }],
+        "mark": { "type": "line", "strokeDash": [6,4] },
+        "encoding": {
+          "x": { "field": "t_c", "type": "quantitative" },
+          "y": { "field": "r_mm", "type": "quantitative" }
+        }
+      }
     ]
   }
-}
-</script>
-
-
-
-
+  </script>
 
   <!-- ============ Embed helper ============ -->
   <script>
@@ -263,12 +319,10 @@
         console.error(`Failed to load ${tagId}:`, e);
       }
     }
-    embedFromTag('#trend',  'spec-trend');
-    embedFromTag('#toploc', 'spec-toploc');
-    embedFromTag('#map',    'spec-map');
+    embedFromTag('#trend',    'spec-trend');
+    embedFromTag('#toploc',   'spec-toploc');
+    embedFromTag('#map',      'spec-map');
+    embedFromTag('#rainTemp', 'spec-rainTemp'); 
   </script>
 </body>
 </html>
-
-
-
