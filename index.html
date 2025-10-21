@@ -215,44 +215,61 @@
   "width": 900,
   "height": 500,
   "title": {"text": {"expr": "'Rainfall by State — ' + mapYear"}, "anchor": "start"},
-  "projection": {"type": "mercator"},
+  "projection": { "type": "mercator" },
+
   "params": [
     {
       "name": "mapYear",
       "value": 2017,
-      "bind": {"name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1}
+      "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
     }
   ],
-  "data": {"url": "rainfall_by_state.csv"},
+
+  "data": { "url": "rainfall_by_state.csv" },
+
   "transform": [
-    {"calculate": "toNumber(datum.Year)", "as": "Y"},
-    {"filter": "datum.Y == mapYear"},
+    { "calculate": "toNumber(datum.Year)", "as": "Y" },
+    { "filter": "datum.Y == mapYear" },
+
     {
       "calculate":
         "({'NSW':'New South Wales','NT':'Northern Territory','QLD':'Queensland','SA':'South Australia','TAS':'Tasmania','VIC':'Victoria','WA':'Western Australia','ACT':'Australian Capital Territory'})[datum.State]",
       "as": "STATE_NAME"
     },
+
     {
       "lookup": "STATE_NAME",
       "from": {
-        "data": {"url": "AUS_states.json", "format": {"type": "topojson", "feature": "AUS_states"}},
+        "data": {
+          "url": "AUS_states.json",
+          "format": { "type": "topojson", "feature": "AUS_states" }
+        },
         "key": "properties.STATE_NAME",
         "fields": ["type","properties","geometry"]
       },
       "as": "feature"
     }
   ],
-  "mark": {"type": "geoshape", "stroke": "white"},
+
+  "mark": { "type": "geoshape", "stroke": "white" },
+
   "encoding": {
-    "shape": {"field": "feature", "type": "geojson"},
-    "color": {"field": "rain_mm", "type": "quantitative", "title": "Avg rainfall (mm)", "scale": {"scheme": "blues"}},
+    "shape": { "field": "feature", "type": "geojson" },
+    "color": {
+      "field": "rain_mm",
+      "type": "quantitative",
+      "title": "Avg rainfall (mm)",
+      "scale": { "scheme": "blues" }
+    },
     "tooltip": [
-      {"field": "State", "type": "nominal", "title": "STATE"},
-      {"field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)"}
+      { "field": "State", "type": "nominal", "title": "STATE" },
+      { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)" }
     ]
   }
 }
 </script>
+
+
 
   <!-- Rainfall vs Temperature spec Scatterplot-->
 <script type="application/json" id="spec-rainTemp">
@@ -318,4 +335,5 @@
   </script>
 </body>
 </html>
+
 
