@@ -11,18 +11,18 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
   <style>
-   
+    /* headings */
     h1, p.header-sub { text-align:center; margin: 0.25rem 0 1rem; }
 
-    
     :root {
       --trend-title-offset: 36px;
       --toploc-title-offset: 36px;
       --map-title-offset: 36px;
       --scatter-title-offset: 36px;
+      --season-title-offset: 36px;
     }
 
-    /* ===== trend chart ===== */
+    /* ===== trend ===== */
     .trend-row{ display:flex; gap:16px; align-items:flex-start; }
     .trend-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
     .trend-notes{
@@ -32,7 +32,7 @@
       padding:10px 12px; background:#fff; line-height:1.35;
     }
 
-    /* =====  top-10 chart ===== */
+    /* ===== top 10 ===== */
     .toploc-row{ display:flex; gap:16px; align-items:flex-start; }
     .toploc-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
     .toploc-notes{
@@ -52,7 +52,7 @@
       padding:10px 12px; background:#fff; line-height:1.35;
     }
 
-    /* ===== rainfall vs temperature (scatter)  ===== */
+    /* ===== rainfall vs temp ===== */
     .scatter-row{ display:flex; gap:16px; align-items:flex-start; }
     .scatter-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
     .scatter-notes{
@@ -62,31 +62,21 @@
       padding:10px 12px; background:#fff; line-height:1.35;
     }
 
-
-  <style>
-  /* ===== monthly seasonality ===== */
-  .season-row{ display:flex; gap:16px; align-items:flex-start; }
-  .season-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
-  .season-notes{
-    flex:0 0 360px; align-self:flex-start;
-    margin-top: 36px; border:1px solid #e5e7eb; border-radius:8px;
-    padding:10px 12px; background:#fff; line-height:1.35;
-  }
-  @media (max-width: 900px){
-    .season-row{ flex-direction:column; }
-    .season-chart{ min-width:0; }
-    .season-notes{ margin-top:8px; }
-  }
-</style>
-
-
-    
+    /* ===== seasonality ===== */
+    .season-row{ display:flex; gap:16px; align-items:flex-start; }
+    .season-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
+    .season-notes{
+      flex:0 0 360px; align-self:flex-start;
+      margin-top: var(--season-title-offset);
+      border:1px solid #e5e7eb; border-radius:8px;
+      padding:10px 12px; background:#fff; line-height:1.35;
+    }
 
     /* Stack on small screens */
     @media (max-width: 900px){
-      .trend-row, .toploc-row, .map-row, .scatter-row{ flex-direction:column; }
-      .trend-chart, .toploc-chart, .map-chart, .scatter-chart{ min-width:0; }
-      .trend-notes, .toploc-notes, .map-notes, .scatter-notes{ margin-top:8px; }
+      .trend-row, .toploc-row, .map-row, .scatter-row, .season-row{ flex-direction:column; }
+      .trend-chart, .toploc-chart, .map-chart, .scatter-chart, .season-chart{ min-width:0; }
+      .trend-notes, .toploc-notes, .map-notes, .scatter-notes, .season-notes{ margin-top:8px; }
     }
   </style>
 </head>
@@ -126,14 +116,14 @@
     <div id="map" class="map-chart"></div>
     <aside class="map-notes">
       <ul style="margin:0; padding-left:1rem;">
-        <li><strong>Top-end stays wettest:</strong> Northern Territory and Queensland dominate state averages most years, with standout peaks in QLD ~5.74&nbsp;mm (2010) and NT ~5.70&nbsp;mm (2017) well above other states.</li>
+        <li><strong>Top-end stays wettest:</strong> Northern Territory and Queensland dominate state averages most years, with standout peaks in QLD ~5.74&nbsp;mm (2010) and NT ~5.70&nbsp;mm (2017).</li>
         <li><strong>South/temperate states are driest:</strong> SA, TAS, VIC and ACT mostly sit around ~1–2&nbsp;mm; lows include SA ~0.98&nbsp;mm (2015) and ACT ~1.05&nbsp;mm (2017).</li>
-        <li><strong>Clear year-to-year swings:</strong> Broad spike 2010–11 (especially QLD/NT), a trough around 2014–15 across many states, then a rebound by 2016–17.</li>
+        <li><strong>Clear year-to-year swings:</strong> Broad spike 2010–11 (especially QLD/NT), a trough around 2014–15, then a rebound by 2016–17.</li>
       </ul>
     </aside>
   </section>
 
-  <!-- ===== Rainfall vs Temperature  ===== -->
+  <!-- ===== Rainfall vs Temperature ===== -->
   <h2>Rainfall vs Temperature</h2>
   <section class="scatter-row">
     <div id="rainTemp" class="scatter-chart"></div>
@@ -146,253 +136,144 @@
     </aside>
   </section>
 
+  <!-- ===== Monthly Seasonality ===== -->
+  <h2>Monthly Seasonality</h2>
+  <section class="season-row">
+    <div id="seasonality" class="season-chart"></div>
+    <aside class="season-notes">
+      <ul style="margin:0; padding-left:1rem;">
+        <li><strong>Wet season signal:</strong> Summer months (≈Dec–Mar) are typically wetter nationwide.</li>
+        <li><strong>Winter lull:</strong> Mid-year (≈Jun–Aug) is the driest period on average.</li>
+        <li><strong>Smooth pattern:</strong> Area/line shows a clear seasonal cycle that complements your yearly trend.</li>
+      </ul>
+    </aside>
+  </section>
 
+  <!-- ================= Vega-Lite SPECS ================= -->
 
+  <!-- Trend -->
+  <script type="application/json" id="spec-trend">{
+    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
+    "width":900,"height":320,
+    "title":{"text":"Average Annual Rainfall — Australia (2008–2017)","anchor":"start","offset":6},
+    "data":{"url":"rainfall_timeseries.csv"},
+    "transform":[{"filter":"datum.Year >= 2008 && datum.Year <= 2017"}],
+    "layer":[
+      {"transform":[{"aggregate":[{"op":"mean","field":"rain_mm","as":"mean_mm"}]}],
+       "mark":{"type":"rule","strokeDash":[6,4],"color":"#888"},
+       "encoding":{"y":{"field":"mean_mm","type":"quantitative","title":"Rainfall (mm)"}}},
+      {"mark":{"type":"line","point":true},
+       "encoding":{"x":{"field":"Year","type":"quantitative","title":"Year","axis":{"format":"d","tickMinStep":1}},
+                   "y":{"field":"rain_mm","type":"quantitative","title":"Rainfall (mm)"},
+                   "tooltip":[{"field":"Year","type":"quantitative"},
+                              {"field":"rain_mm","type":"quantitative","format":".2f","title":"Avg (mm)"}]}}
+    ]}</script>
 
-  <!-- ============ Vega-Lite specs ============ -->
-
-  <!-- Trend spec -->
-  <script type="application/json" id="spec-trend">
-  {
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "width": 900,
-    "height": 320,
-    "title": { "text": "Average Annual Rainfall — Australia (2008–2017)", "anchor": "start", "offset": 6 },
-    "data": { "url": "rainfall_timeseries.csv" },
-    "transform": [{ "filter": "datum.Year >= 2008 && datum.Year <= 2017" }],
-    "layer": [
-      {
-        "transform": [{ "aggregate": [{ "op": "mean", "field": "rain_mm", "as": "mean_mm" }] }],
-        "mark": { "type": "rule", "strokeDash": [6,4], "color": "#888" },
-        "encoding": { "y": { "field": "mean_mm", "type": "quantitative", "title": "Rainfall (mm)" } }
-      },
-      {
-        "mark": { "type": "line", "point": true },
-        "encoding": {
-          "x": { "field": "Year", "type": "quantitative", "title": "Year", "axis": { "format": "d", "tickMinStep": 1 } },
-          "y": { "field": "rain_mm", "type": "quantitative", "title": "Rainfall (mm)" },
-          "tooltip": [
-            { "field": "Year", "type": "quantitative" },
-            { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "Avg (mm)" }
-          ]
-        }
-      }
-    ]
-  }
-  </script>
-
-  <!-- Top locations spec -->
-  <script type="application/json" id="spec-toploc">
-  {
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "width": 800,
-    "height": 420,
-    "title": "Top 10 Locations by Average Rainfall",
-    "params": [
-      { "name": "year_sel", "value": 2017,
-        "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 } }
+  <!-- Top locations -->
+  <script type="application/json" id="spec-toploc">{
+    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
+    "width":800,"height":420,"title":"Top 10 Locations by Average Rainfall",
+    "params":[{"name":"year_sel","value":2017,"bind":{"name":"Year: ","input":"range","min":2008,"max":2017,"step":1}}],
+    "data":{"url":"rainfall_by_location.csv"},
+    "transform":[
+      {"calculate":"toNumber(datum.Year)","as":"YearNum"},
+      {"filter":"datum.YearNum == year_sel"},
+      {"window":[{"op":"rank","as":"rank"}],"sort":[{"field":"rain_mm","order":"descending"}]},
+      {"filter":"datum.rank <= 10"}
     ],
-    "data": { "url": "rainfall_by_location.csv" },
-    "transform": [
-      { "calculate": "toNumber(datum.Year)", "as": "YearNum" },
-      { "filter": "datum.YearNum == year_sel" },
-      { "window": [ { "op": "rank", "as": "rank" } ], "sort": [ { "field": "rain_mm", "order": "descending" } ] },
-      { "filter": "datum.rank <= 10" }
+    "mark":"bar",
+    "encoding":{
+      "y":{"field":"Location","type":"nominal","sort":"-x","title":null},
+      "x":{"field":"rain_mm","type":"quantitative","title":"Avg rainfall (mm)","scale":{"domain":[0,10],"nice":false,"clamp":true},
+           "axis":{"values":[0,1,2,3,4,5,6,7,8,9,10],"tickCount":11}},
+      "color":{"field":"Location","type":"nominal","legend":{"title":"Location"},"scale":{"scheme":"tableau20"}},
+      "tooltip":[{"field":"Location","type":"nominal"},{"field":"rain_mm","type":"quantitative","format":".1f","title":"Avg (mm)"}]
+    }}</script>
+
+  <!-- Map -->
+  <script type="application/json" id="spec-map">{
+    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
+    "width":900,"height":500,
+    "title":{"text":{"expr":"'Rainfall by State — ' + mapYear"},"anchor":"start"},
+    "projection":{"type":"mercator"},
+    "params":[{"name":"mapYear","value":2017,"bind":{"name":"Year: ","input":"range","min":2008,"max":2017,"step":1}}],
+    "data":{"url":"AUS_states.json","format":{"type":"topojson","feature":"AUS_states"}},
+    "transform":[
+      {"calculate":"({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]","as":"abbr"},
+      {"lookup":"abbr",
+       "from":{"data":{"url":"rainfall_by_state.csv"},
+               "transform":[{"calculate":"toNumber(datum.Year)","as":"Y"},{"filter":"datum.Y == mapYear"}],
+               "key":"State","fields":["rain_mm"]}}
     ],
-    "mark": "bar",
-    "encoding": {
-      "y": { "field": "Location", "type": "nominal", "sort": "-x", "title": null },
-      "x": {
-        "field": "rain_mm",
-        "type": "quantitative",
-        "title": "Avg rainfall (mm)",
-        "scale": { "domain": [0, 10], "nice": false, "clamp": true },
-        "axis": { "values": [0,1,2,3,4,5,6,7,8,9,10], "tickCount": 11 }
-      },
-      "color": {
-        "field": "Location",
-        "type": "nominal",
-        "legend": {"title": "Location"},
-        "scale": {
-          "domain": [
-            "Cairns","CoffsHarbour","Darwin","Townsville","GoldCoast",
-            "MountGambier","Tuggeranong","Wollongong","Brisbane","MountGinini",
-            "Sydney","Katherine","NorahHead","Newcastle","Williamtown",
-            "Walpole","Witchcliffe","NorfolkIsland","SydneyAirport"
-          ],
-          "scheme": "tableau20"
-        }
-      },
-      "tooltip": [
-        { "field": "Location", "type": "nominal" },
-        { "field": "rain_mm", "type": "quantitative", "format": ".1f", "title": "Avg (mm)" }
-      ]
-    }
-  }
-  </script>
+    "mark":{"type":"geoshape","stroke":"white"},
+    "encoding":{
+      "color":{"field":"rain_mm","type":"quantitative","title":"Avg rainfall (mm)","scale":{"scheme":"blues"}},
+      "tooltip":[{"field":"properties.STATE_NAME","type":"nominal","title":"State"},
+                 {"field":"abbr","type":"nominal","title":"Code"},
+                 {"field":"rain_mm","type":"quantitative","format":".2f","title":"Avg (mm)"}]
+    }}</script>
 
-  <!-- Map spec -->
-<script type="application/json" id="spec-map">
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 900,
-  "height": 500,
-  "title": {"text": {"expr": "'Rainfall by State — ' + mapYear"}, "anchor": "start"},
-  "projection": { "type": "mercator" },
+  <!-- Rainfall vs Temperature -->
+  <script type="application/json" id="spec-rainTemp">{
+    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
+    "width":900,"height":420,
+    "title":"Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
+    "data":{"url":"weatherAUS.csv","format":{"type":"csv"}},
+    "transform":[
+      {"calculate":"toDate(datum.Date)","as":"D"},
+      {"calculate":"year(datum.D)","as":"Year"},
+      {"calculate":"month(datum.D)","as":"Month"},
+      {"filter":"datum.Year >= 2008 && datum.Year <= 2017"},
+      {"aggregate":[{"op":"mean","field":"Rainfall","as":"r_mm"},{"op":"mean","field":"MaxTemp","as":"t_c"}],
+       "groupby":["Year","Month"]},
+      {"filter":"isFinite(datum.r_mm) && isFinite(datum.t_c)"}
+    ],
+    "layer":[
+      {"mark":{"type":"point","filled":true,"opacity":0.55,"size":60},
+       "encoding":{"x":{"field":"t_c","type":"quantitative","title":"Avg temperature (°C)"},
+                   "y":{"field":"r_mm","type":"quantitative","title":"Avg rainfall (mm)"},
+                   "color":{"field":"Year","type":"ordinal","legend":{"title":"Year"},"scale":{"scheme":"plasma"}},
+                   "tooltip":[{"field":"Year","type":"quantitative"},{"field":"Month","type":"quantitative"},
+                              {"field":"t_c","type":"quantitative","format":".1f","title":"Temp (°C)"},
+                              {"field":"r_mm","type":"quantitative","format":".2f","title":"Rain (mm)"}]}},
+      {"transform":[{"regression":"r_mm","on":"t_c"}],
+       "mark":{"type":"line","strokeDash":[6,4]}}
+    ]}</script>
 
-  "params": [
-    {
-      "name": "mapYear",
-      "value": 2017,
-      "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
-    }
-  ],
-
-  "data": {
-    "url": "AUS_states.json",
-    "format": { "type": "topojson", "feature": "AUS_states" }
-  },
-
-  "transform": [
-    {
-      "calculate":
-        "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]",
-      "as": "abbr"
+  <!-- Seasonality -->
+  <script type="application/json" id="spec-seasonality">{
+    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
+    "width":900,"height":320,
+    "title":"Average Monthly Rainfall — Australia (2008–2017)",
+    "data":{"url":"weatherAUS.csv","format":{"type":"csv","parse":{"Date":"date","Rainfall":"number"}}},
+    "transform":[
+      {"filter":"isValid(datum.Rainfall) && isFinite(+datum.Rainfall)"},
+      {"calculate":"year(datum.Date)","as":"Y"},
+      {"filter":"datum.Y >= 2008 && datum.Y <= 2017"}
+    ],
+    "encoding":{
+      "x":{"timeUnit":"month","field":"Date","title":null,"axis":{"format":"%b"}},
+      "y":{"aggregate":"mean","field":"Rainfall","title":"Avg rainfall (mm)"},
+      "tooltip":[{"timeUnit":"month","field":"Date","title":"Month","format":"%b"},
+                 {"aggregate":"mean","field":"Rainfall","title":"Avg (mm)","format":".2f"}]
     },
-    {
-      "lookup": "abbr",
-      "from": {
-        "data": { "url": "rainfall_by_state.csv" },
-        "transform": [
-          { "calculate": "toNumber(datum.Year)", "as": "Y" },
-          { "filter": "datum.Y == mapYear" }
-        ],
-        "key": "State",
-        "fields": ["rain_mm"]
-      }
-    }
-  ],
-
-  "mark": { "type": "geoshape", "stroke": "white" },
-
-  "encoding": {
-    "color": {
-      "field": "rain_mm",
-      "type": "quantitative",
-      "title": "Avg rainfall (mm)",
-      "scale": { "scheme": "blues" }
-    },
-    "tooltip": [
-      {
-        "field": "properties.STATE_NAME",
-        "type": "nominal",
-        "title": "State"
-      },
-      { "field": "abbr", "type": "nominal", "title": "Code" },
-      { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "Avg (mm)" }
-    ]
-  }
-}
-</script>
-
-
-
-  <!-- Rainfall vs Temperature spec Scatterplot-->
-<script type="application/json" id="spec-rainTemp">
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 900,
-  "height": 420,
-  "title": "Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
-  "data": { "url": "weatherAUS.csv", "format": { "type": "csv" } },
-  "transform": [
-    { "calculate": "toDate(datum.Date)", "as": "D" },
-    { "calculate": "year(datum.D)", "as": "Year" },
-    { "calculate": "month(datum.D)", "as": "Month" },
-    { "filter": "datum.Year >= 2008 && datum.Year <= 2017" },
-    {
-      "aggregate": [
-        { "op": "mean", "field": "Rainfall", "as": "r_mm" },
-        { "op": "mean", "field": "MaxTemp", "as": "t_c" }
-      ],
-      "groupby": ["Year","Month"]
-    },
-    { "filter": "isFinite(datum.r_mm) && isFinite(datum.t_c)" }
-  ],
-  "layer": [
-    {
-      "mark": { "type": "point", "filled": true, "opacity": 0.55, "size": 60 },
-      "encoding": {
-        "x": { "field": "t_c", "type": "quantitative", "title": "Avg temperature (°C)" },
-        "y": { "field": "r_mm", "type": "quantitative", "title": "Avg rainfall (mm)" },
-        "color": { "field": "Year", "type": "ordinal", "legend": {"title": "Year"}, "scale": {"scheme": "plasma"} },
-        "tooltip": [
-          { "field": "Year", "type": "quantitative" },
-          { "field": "Month", "type": "quantitative" },
-          { "field": "t_c", "type": "quantitative", "format": ".1f", "title": "Temp (°C)" },
-          { "field": "r_mm", "type": "quantitative", "format": ".2f", "title": "Rain (mm)" }
-        ]
-      }
-    },
-    { "transform": [ { "regression": "r_mm", "on": "t_c" } ],
-      "mark": { "type": "line", "strokeDash": [6,4] } }
-  ]
-}
-</script>
-
-<script type="application/json" id="spec-seasonality">
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 900,
-  "height": 320,
-  "title": "Average Monthly Rainfall — Australia (2008–2017)",
-  "data": {
-    "url": "weatherAUS.csv",
-    "format": { "type": "csv", "parse": { "Date": "date", "Rainfall": "number" } }
-  },
-  "transform": [
-    { "filter": "isValid(datum.Rainfall) && isFinite(+datum.Rainfall)" },
-    { "calculate": "year(datum.Date)", "as": "Y" },
-    { "filter": "datum.Y >= 2008 && datum.Y <= 2017" }
-  ],
-  "encoding": {
-    "x": { "timeUnit": "month", "field": "Date", "title": null, "axis": { "format": "%b" } },
-    "y": { "aggregate": "mean", "field": "Rainfall", "title": "Avg rainfall (mm)" },
-    "tooltip": [
-      { "timeUnit": "month", "field": "Date", "title": "Month", "format": "%b" },
-      { "aggregate": "mean", "field": "Rainfall", "title": "Avg (mm)", "format": ".2f" }
-    ]
-  },
-  "layer": [
-    { "mark": { "type": "area", "opacity": 0.15 } },
-    { "mark": { "type": "line" } },
-    { "mark": { "type": "point" } }
-  ]
-}
-</script>
-
+    "layer":[
+      {"mark":{"type":"area","opacity":0.15}},
+      {"mark":{"type":"line"}},
+      {"mark":{"type":"point"}}
+    ]}</script>
 
   <!-- ============ Embed helper ============ -->
   <script>
     function embedFromTag(target, tagId) {
-      try {
-        const spec = JSON.parse(document.getElementById(tagId).textContent);
-        return vegaEmbed(target, spec, { actions: false });
-      } catch (e) {
-        console.error(`Failed to load ${tagId}:`, e);
-      }
+      const spec = JSON.parse(document.getElementById(tagId).textContent);
+      return vegaEmbed(target, spec, { actions: false });
     }
-    embedFromTag('#trend',    'spec-trend');
-    embedFromTag('#toploc',   'spec-toploc');
-    embedFromTag('#map',      'spec-map');
-    embedFromTag('#rainTemp', 'spec-rainTemp'); 
+    embedFromTag('#trend', 'spec-trend');
+    embedFromTag('#toploc', 'spec-toploc');
+    embedFromTag('#map', 'spec-map');
+    embedFromTag('#rainTemp', 'spec-rainTemp');
     embedFromTag('#seasonality', 'spec-seasonality');
   </script>
 </body>
 </html>
-
-
-
-
-
-
