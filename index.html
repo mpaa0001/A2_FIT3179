@@ -121,7 +121,7 @@
       <ul style="margin:0; padding-left:1rem;">
         <li><strong>Cooler months tend to be wetter:</strong> regression line slopes down, indicating higher rainfall at lower average max temps.</li>
         <li><strong>Seasonality:</strong> points cluster into cooler-wetter vs hotter-drier months, complementing the yearly trend.</li>
-        <li><strong>Outliers:</strong> very wet, warm tropical months sit above the trend — highlighting the monsoonal north’s influence.</li>
+        <li><strong>Outliers:</strong> very wet, warm tropical months sit above the trend, highlighting the monsoonal north’s influence.</li>
       </ul>
     </aside>
   </section>
@@ -209,105 +209,97 @@
   </script>
 
   <!-- Map spec -->
-  <script type="application/json" id="spec-map">
-  {
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "width": 900,
-    "height": 500,
-    "title": {"text": {"expr": "'Rainfall by State — ' + mapYear"}, "anchor": "start"},
-    "projection": { "type": "mercator" },
-    "params": [
-      {
-        "name": "mapYear",
-        "value": 2017,
-        "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
-      }
-    ],
-    "data": { "url": "rainfall_by_state.csv" },
-    "transform": [
-      { "calculate": "toNumber(datum.Year)", "as": "Y" },
-      { "filter": "datum.Y == mapYear" },
-      {
-        "calculate":
-          "({'NSW':'New South Wales','NT':'Northern Territory','QLD':'Queensland','SA':'South Australia','TAS':'Tasmania','VIC':'Victoria','WA':'Western Australia','ACT':'Australian Capital Territory'})[datum.State]",
-        "as": "STATE_NAME"
-      },
-      {
-        "lookup": "STATE_NAME",
-        "from": {
-          "data": {
-            "url": "AUS_states.json",
-            "format": { "type": "topojson", "feature": "AUS_states" }
-          },
-          "key": "properties.STATE_NAME",
-          "fields": ["type","properties","geometry"]
-        },
-        "as": "feature"
-      }
-    ],
-    "mark": { "type": "geoshape", "stroke": "white" },
-    "encoding": {
-      "shape": { "field": "feature", "type": "geojson" },
-      "color": {
-        "field": "rain_mm",
-        "type": "quantitative",
-        "title": "Avg rainfall (mm)",
-        "scale": { "scheme": "blues" }
-      },
-      "tooltip": [
-        { "field": "State", "type": "nominal", "title": "STATE" },
-        { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)" }
-      ]
+<script type="application/json" id="spec-map">
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 500,
+  "title": {"text": {"expr": "'Rainfall by State — ' + mapYear"}, "anchor": "start"},
+  "projection": {"type": "mercator"},
+  "params": [
+    {
+      "name": "mapYear",
+      "value": 2017,
+      "bind": {"name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1}
     }
-  }
-  </script>
-
-  <!-- Rainfall vs Temperature spec Scatterplot-->
-  <script type="application/json" id="spec-rainTemp">
-  {
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "width": 800,
-    "height": 420,
-    "title": "Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
-    "data": { "url": "weatherAUS.csv" },
-    "transform": [
-      { "calculate": "year(toDate(datum.Date))", "as": "Year" },
-      { "calculate": "month(toDate(datum.Date))", "as": "Month" },
-      { "filter": "datum.Year >= 2008 && datum.Year <= 2017" },
-      /* CHANGE FIELD NAMES IF NEEDED: Rainfall / MaxTemp */
-      {
-        "aggregate": [
-          { "op": "mean", "field": "Rainfall", "as": "r_mm" },
-          { "op": "mean", "field": "MaxTemp", "as": "t_c" }
-        ],
-        "groupby": ["Year","Month"]
-      }
-    ],
-    "layer": [
-      {
-        "mark": { "type": "point", "filled": true, "opacity": 0.7 },
-        "encoding": {
-          "x": { "field": "t_c", "type": "quantitative", "title": "Avg temperature (°C)" },
-          "y": { "field": "r_mm", "type": "quantitative", "title": "Avg rainfall (mm)" },
-          "tooltip": [
-            { "field": "Year", "type": "ordinal" },
-            { "field": "Month", "type": "ordinal" },
-            { "field": "t_c", "type": "quantitative", "format": ".1f", "title": "Temp (°C)" },
-            { "field": "r_mm", "type": "quantitative", "format": ".2f", "title": "Rain (mm)" }
-          ]
-        }
+  ],
+  "data": {"url": "rainfall_by_state.csv"},
+  "transform": [
+    {"calculate": "toNumber(datum.Year)", "as": "Y"},
+    {"filter": "datum.Y == mapYear"},
+    {
+      "calculate":
+        "({'NSW':'New South Wales','NT':'Northern Territory','QLD':'Queensland','SA':'South Australia','TAS':'Tasmania','VIC':'Victoria','WA':'Western Australia','ACT':'Australian Capital Territory'})[datum.State]",
+      "as": "STATE_NAME"
+    },
+    {
+      "lookup": "STATE_NAME",
+      "from": {
+        "data": {"url": "AUS_states.json", "format": {"type": "topojson", "feature": "AUS_states"}},
+        "key": "properties.STATE_NAME",
+        "fields": ["type","properties","geometry"]
       },
-      {
-        "transform": [{ "regression": "r_mm", "on": "t_c" }],
-        "mark": { "type": "line", "strokeDash": [6,4] },
-        "encoding": {
-          "x": { "field": "t_c", "type": "quantitative" },
-          "y": { "field": "r_mm", "type": "quantitative" }
-        }
-      }
+      "as": "feature"
+    }
+  ],
+  "mark": {"type": "geoshape", "stroke": "white"},
+  "encoding": {
+    "shape": {"field": "feature", "type": "geojson"},
+    "color": {"field": "rain_mm", "type": "quantitative", "title": "Avg rainfall (mm)", "scale": {"scheme": "blues"}},
+    "tooltip": [
+      {"field": "State", "type": "nominal", "title": "STATE"},
+      {"field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "avg (mm)"}
     ]
   }
-  </script>
+}
+</script>
+
+  <!-- Rainfall vs Temperature spec Scatterplot-->
+<script type="application/json" id="spec-rainTemp">
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 800,
+  "height": 420,
+  "title": "Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
+  "data": {"url": "weatherAUS.csv"},
+  "transform": [
+    {"calculate": "year(toDate(datum.Date))", "as": "Year"},
+    {"calculate": "month(toDate(datum.Date))", "as": "Month"},
+    {"filter": "datum.Year >= 2008 && datum.Year <= 2017"},
+    {
+      "aggregate": [
+        {"op": "mean", "field": "Rainfall", "as": "r_mm"},
+        {"op": "mean", "field": "MaxTemp", "as": "t_c"}
+      ],
+      "groupby": ["Year","Month"]
+    }
+  ],
+  "layer": [
+    {
+      "mark": {"type": "point", "filled": true, "opacity": 0.7},
+      "encoding": {
+        "x": {"field": "t_c", "type": "quantitative", "title": "Avg temperature (°C)"},
+        "y": {"field": "r_mm", "type": "quantitative", "title": "Avg rainfall (mm)"},
+        "tooltip": [
+          {"field": "Year", "type": "ordinal"},
+          {"field": "Month", "type": "ordinal"},
+          {"field": "t_c", "type": "quantitative", "format": ".1f", "title": "Temp (°C)"},
+          {"field": "r_mm", "type": "quantitative", "format": ".2f", "title": "Rain (mm)"}
+        ]
+      }
+    },
+    {
+      "transform": [{"regression": "r_mm", "on": "t_c"}],
+      "mark": {"type": "line", "strokeDash": [6,4]},
+      "encoding": {
+        "x": {"field": "t_c", "type": "quantitative"},
+        "y": {"field": "r_mm", "type": "quantitative"}
+      }
+    }
+  ]
+}
+</script>
+
 
   <!-- ============ Embed helper ============ -->
   <script>
@@ -326,3 +318,4 @@
   </script>
 </body>
 </html>
+
