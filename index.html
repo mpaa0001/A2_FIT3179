@@ -251,6 +251,7 @@
 
   
   <!-- Rainfall vs Temperature -->
+<!-- Rainfall vs Temperature -->
 <script type="application/json" id="spec-rainTemp">
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -258,31 +259,30 @@
   "height": 420,
   "title": "Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
   "data": {
-    "url": "weatherAUS.csv",
+    "url": "weatherAUS_cleaned.csv",
     "format": {
       "type": "csv",
       "parse": { "Date": "date", "Rainfall": "number", "MaxTemp": "number" }
     }
   },
   "transform": [
-    { "filter": "isValid(datum.Rainfall) && isFinite(datum.Rainfall) && isValid(datum.MaxTemp) && isFinite(datum.MaxTemp)" },
-
-    { "timeUnit": "yearmonth", "field": "Date", "as": "YM" },
-    { "timeUnit": "year",       "field": "Date", "as": "Year" },
-
+    {
+      "timeUnit": "yearmonth", "field": "Date", "as": "YM"
+    },
+    {
+      "timeUnit": "year", "field": "Date", "as": "Year"
+    },
     {
       "aggregate": [
         { "op": "mean", "field": "Rainfall", "as": "r_mm" },
-        { "op": "mean", "field": "MaxTemp",  "as": "t_c" }
+        { "op": "mean", "field": "MaxTemp", "as": "t_c" }
       ],
-      "groupby": ["YM","Year"]
+      "groupby": ["YM", "Year"]
     },
-
-    { "filter": "year(datum.YM) >= 2008 && year(datum.YM) <= 2017" },
-
-    { "filter": "isFinite(datum.r_mm) && isFinite(datum.t_c)" }
+    {
+      "filter": "year(datum.YM) >= 2008 && year(datum.YM) <= 2017"
+    }
   ],
-
   "layer": [
     {
       "mark": { "type": "point", "filled": true, "opacity": 0.6, "size": 60 },
@@ -307,6 +307,7 @@
   ]
 }
 </script>
+
 
 
   <!-- Seasonality -->
@@ -346,6 +347,7 @@
   </script>
 </body>
 </html>
+
 
 
 
