@@ -230,9 +230,11 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "width": 900,
   "height": 500,
-  "title": { "text": {"expr": "'Rainfall by State — ' + mapYear"}, "anchor": "start" },
+  "title": {
+    "text": { "expr": "'Rainfall by State — ' + mapYear" },
+    "anchor": "start"
+  },
   "projection": { "type": "mercator" },
-
   "params": [
     {
       "name": "mapYear",
@@ -246,24 +248,22 @@
       }
     }
   ],
-
   "data": {
-    "url": "AUS_states.json",
+    "url": "data/aus_states.topo.json",
     "format": {
       "type": "topojson",
-      "feature": "STE_2021_AUST_GDA2020"
+      "feature": "AUS_states"
     }
   },
-
   "transform": [
     {
-      "lookup": "properties.STE_NAME21",
+      "lookup": "properties.name",
       "from": {
         "data": {
           "url": "rainfall_by_state.csv"
         },
         "key": "State",
-        "fields": ["Year", "rain_mm"]
+        "fields": ["rain_mm", "Year"]
       }
     },
     {
@@ -278,26 +278,27 @@
       "as": "rain_mm_label"
     }
   ],
-
   "mark": {
     "type": "geoshape",
     "stroke": "white"
   },
-
   "encoding": {
     "color": {
       "field": "rain_mm",
       "type": "quantitative",
       "title": "Rainfall (mm)",
-      "scale": { "scheme": "blues" }
+      "scale": {
+        "scheme": "blues"
+      }
     },
     "tooltip": [
-      { "field": "properties.STE_NAME21", "title": "State" },
-      { "field": "rain_mm", "title": "Rainfall (mm)" }
+      { "field": "properties.name", "type": "nominal", "title": "State" },
+      { "field": "rain_mm", "type": "quantitative", "title": "Rainfall (mm)" }
     ]
   }
 }
 </script>
+
 
 
   
@@ -397,6 +398,7 @@
   </script>
 </body>
 </html>
+
 
 
 
