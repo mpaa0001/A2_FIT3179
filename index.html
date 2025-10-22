@@ -251,61 +251,91 @@
 
   
   <!-- Rainfall vs Temperature -->
+<!-- Rainfall vs Max Temperature -->
 <script type="application/json" id="spec-rainTemp">
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 900,
-  "height": 420,
-  "title": "Monthly Average Rainfall vs Temperature — Australia (2008–2017)",
+  "title": "Rainfall vs Max Temperature by Season",
+  "width": 550,
+  "height": 400,
   "data": {
     "url": "weatherAUS_cleaned.csv",
-    "format": {
-      "type": "csv",
-      "parse": { "Date": "date", "Rainfall": "number", "MaxTemp": "number" }
-    }
+    "format": { "type": "csv" }
   },
   "transform": [
     {
-      "timeUnit": "yearmonth", "field": "Date", "as": "YM"
+      "calculate": "month(datum.Date)",
+      "as": "Month"
     },
     {
-      "timeUnit": "year", "field": "Date", "as": "Year"
-    },
-    {
-      "aggregate": [
-        { "op": "mean", "field": "Rainfall", "as": "r_mm" },
-        { "op": "mean", "field": "MaxTemp", "as": "t_c" }
-      ],
-      "groupby": ["YM", "Year"]
-    },
-    {
-      "filter": "year(datum.YM) >= 2008 && year(datum.YM) <= 2017"
+      "calculate": "['Summer','Summer','Autumn','Autumn','Autumn','Winter','Winter','Winter','Spring','Spring','Spring','Summer'][datum.Month - 1]",
+      "as": "Season"
     }
   ],
   "layer": [
     {
-      "mark": { "type": "point", "filled": true, "opacity": 0.6, "size": 60 },
+      "mark": {
+        "type": "point",
+        "opacity": 0.3,
+        "filled": true
+      },
       "encoding": {
-        "x": { "field": "t_c", "type": "quantitative", "title": "Avg temperature (°C)" },
-        "y": { "field": "r_mm", "type": "quantitative", "title": "Avg rainfall (mm)" },
+        "x": {
+          "field": "MaxTemp",
+          "type": "quantitative",
+          "title": "Max Temperature (°C)"
+        },
+        "y": {
+          "field": "Rainfall",
+          "type": "quantitative",
+          "title": "Rainfall (mm)"
+        },
         "color": {
-          "field": "Year", "type": "ordinal",
-          "legend": {"title": "Year"}, "scale": {"scheme": "plasma"}
+          "field": "Season",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Summer", "Autumn", "Winter", "Spring"],
+            "range": ["#FF7F50", "#FFD700", "#1E90FF", "#32CD32"]
+          },
+          "title": "Season"
         },
         "tooltip": [
-          { "field": "Year", "type": "quantitative" },
-          { "field": "t_c",  "type": "quantitative", "format": ".1f", "title": "Temp (°C)" },
-          { "field": "r_mm", "type": "quantitative", "format": ".2f", "title": "Rain (mm)" }
+          { "field": "Date", "type": "temporal", "title": "Date" },
+          { "field": "Location", "type": "nominal" },
+          { "field": "MaxTemp", "type": "quantitative", "title": "Max Temp (°C)" },
+          { "field": "Rainfall", "type": "quantitative", "title": "Rainfall (mm)" },
+          { "field": "Season", "type": "nominal" }
         ]
       }
     },
     {
-      "transform": [ { "regression": "r_mm", "on": "t_c" } ],
-      "mark": { "type": "line", "strokeDash": [6,4] }
+      "mark": {
+        "type": "line",
+        "color": "black",
+        "strokeDash": [4, 4]
+      },
+      "transform": [
+        {
+          "regression": "Rainfall",
+          "on": "MaxTemp",
+          "method": "linear"
+        }
+      ],
+      "encoding": {
+        "x": {
+          "field": "MaxTemp",
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "Rainfall",
+          "type": "quantitative"
+        }
+      }
     }
   ]
 }
 </script>
+
 
 
 
@@ -368,6 +398,7 @@
   </script>
 </body>
 </html>
+
 
 
 
