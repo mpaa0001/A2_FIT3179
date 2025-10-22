@@ -11,6 +11,14 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
   <style>
+    .subtitle {
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: -0.5rem 0 1.5rem;
+  color: #555;
+}
+
     /* headings */
     h1, p.header-sub { text-align:center; margin: 0.25rem 0 1rem; }
 
@@ -86,6 +94,7 @@
 
   <!-- ===== National Annual Rainfall ===== -->
   <h2>National Annual Rainfall</h2>
+  <p class="subtitle">Yearly average rainfall across Australia from 2008 to 2017.</p>
   <section class="trend-row">
     <div id="trend" class="trend-chart"></div>
     <aside class="trend-notes">
@@ -99,6 +108,7 @@
 
   <!-- ===== Top 10 Locations (by year) ===== -->
   <h2>Top 10 Locations (by year)</h2>
+  <p class="subtitle">Top 10 locations with the highest average rainfall each year.</p>
   <section class="toploc-row">
     <div id="toploc" class="toploc-chart"></div>
     <aside class="toploc-notes">
@@ -112,6 +122,7 @@
 
   <!-- ===== Rainfall by State (Choropleth) ===== -->
   <h2>Rainfall by State (Choropleth)</h2>
+  <p class="subtitle">Rainfall distribution across states for the selected year.</p>
   <section class="map-row">
     <div id="map" class="map-chart"></div>
     <aside class="map-notes">
@@ -125,6 +136,8 @@
 
   <!-- ===== Rainfall vs Temperature ===== -->
 <h2>Rainfall vs Temperature</h2>
+<p class="subtitle">How rainfall levels vary with temperature across seasons.</p>
+
 <section class="scatter-row">
   <div id="rainTemp" class="scatter-chart"></div>
   <aside class="scatter-notes">
@@ -139,6 +152,8 @@
 
  <h2>Monthly Seasonality</h2>
 <section class="season-row">
+<p class="subtitle">Average rainfall trends across months, highlighting seasonal patterns.</p>
+
   <div id="seasonality" class="season-chart"></div>
   <aside class="season-notes">
     <ul style="margin:0; padding-left:1rem;">
@@ -390,6 +405,7 @@
   </script>
 </body>
 </html>
+
 
 
 
