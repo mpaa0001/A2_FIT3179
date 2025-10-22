@@ -225,7 +225,7 @@
 </script>
 
   <!-- Map -->
-  <script type="application/json" id="spec-map">
+ <script type="application/json" id="spec-map">
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "width": 900,
@@ -253,19 +253,20 @@
     {
       "lookup": "STATE_NAME",
       "from": {
-        "data": { "url": "AUS_states.json",
-                  "format": { "type": "topojson", "feature": "AUS_states" } },
-        "key": "properties.STATE_NAME",
-        "fields": ["type","properties","geometry"]
+        "data": { 
+          "url": "AUS_states.json",
+          "format": { "type": "topojson", "feature": "AUS_states" }
+        },
+        "key": "properties.STATE_NAME"
       },
-      "as": "feature"
+      "as": "geo"
     }
   ],
 
   "mark": { "type": "geoshape", "stroke": "white" },
 
   "encoding": {
-    "shape": { "field": "feature", "type": "geojson" },
+    "shape": { "field": "geo", "type": "geojson" },
     "color": {
       "field": "rain_mm",
       "type": "quantitative",
@@ -280,6 +281,8 @@
 }
 </script>
 
+
+  
   <!-- Rainfall vs Temperature -->
 <script type="application/json" id="spec-rainTemp">
 {
@@ -376,6 +379,7 @@
   </script>
 </body>
 </html>
+
 
 
 
