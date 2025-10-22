@@ -251,7 +251,6 @@
 
   
   <!-- Rainfall vs Temperature -->
-<!-- Rainfall vs Max Temperature -->
 <script type="application/json" id="spec-rainTemp">
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -366,20 +365,7 @@
 
 
 
-  <!-- Test -->
-<script type="application/json" id="spec-test">
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "data": { "url": "weatherAUS_cleaned.csv", "format": {"type": "csv"} },
-  "mark": "point",
-  "encoding": {
-    "x": { "field": "MaxTemp", "type": "quantitative" },
-    "y": { "field": "Rainfall", "type": "quantitative" }
-  }
-}
-</script>
-
-<div id="test"></div>
+  
 
 
   <!-- ============ Embed helper ============ -->
@@ -393,11 +379,11 @@
     embedFromTag('#map', 'spec-map');
     embedFromTag('#rainTemp', 'spec-rainTemp');
     embedFromTag('#seasonality', 'spec-seasonality');
-    embedFromTag('#test', 'spec-test');
 
   </script>
 </body>
 </html>
+
 
 
 
