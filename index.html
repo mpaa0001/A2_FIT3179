@@ -240,22 +240,57 @@
   <!-- ================= Vega-Lite SPECS ================= -->
 
   <!-- Trend -->
-  <script type="application/json" id="spec-trend">{
-    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
-    "width":900,"height":320,
-    "title":{"text":"Average Annual Rainfall — Australia (2008–2017)","anchor":"start","offset":6},
-    "data":{"url":"rainfall_timeseries.csv"},
-    "transform":[{"filter":"datum.Year >= 2008 && datum.Year <= 2017"}],
-    "layer":[
-      {"transform":[{"aggregate":[{"op":"mean","field":"rain_mm","as":"mean_mm"}]}],
-       "mark":{"type":"rule","strokeDash":[6,4],"color":"#888"},
-       "encoding":{"y":{"field":"mean_mm","type":"quantitative","title":"Rainfall (mm)"}}},
-      {"mark":{"type":"line","point":true},
-       "encoding":{"x":{"field":"Year","type":"quantitative","title":"Year","axis":{"format":"d","tickMinStep":1}},
-                   "y":{"field":"rain_mm","type":"quantitative","title":"Rainfall (mm)"},
-                   "tooltip":[{"field":"Year","type":"quantitative"},
-                              {"field":"rain_mm","type":"quantitative","format":".2f","title":"Avg (mm)"}]}}
-    ]}</script>
+<script type="application/json" id="spec-trend">
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 320,
+  "title": { "text": "Average Annual Rainfall — Australia (2008–2017)", "anchor": "start", "offset": 6 },
+  "data": { "url": "rainfall_timeseries.csv" },
+  "transform": [{ "filter": "datum.Year >= 2008 && datum.Year <= 2017" }],
+  "layer": [
+    {
+      "transform": [{ "aggregate": [{ "op": "mean", "field": "rain_mm", "as": "mean_mm" }] }],
+      "mark": { "type": "rule", "strokeDash": [6, 4], "color": "#888" },
+      "encoding": { "y": { "field": "mean_mm", "type": "quantitative", "title": "Rainfall (mm)" } }
+    },
+    {
+      "mark": { "type": "line", "point": true },
+      "encoding": {
+        "x": { "field": "Year", "type": "quantitative", "title": "Year", "axis": { "format": "d", "tickMinStep": 1 } },
+        "y": { "field": "rain_mm", "type": "quantitative", "title": "Rainfall (mm)" },
+        "tooltip": [
+          { "field": "Year", "type": "quantitative" },
+          { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "Avg (mm)" }
+        ]
+      }
+    },
+    {
+      "data": {
+        "values": [
+          { "Year": 2011, "rain_mm": 2.85, "label": "La Niña" },
+          { "Year": 2014, "rain_mm": 2.0, "label": "El Niño" }
+        ]
+      },
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "middle",
+        "dx": 10,
+        "dy": -10,
+        "color": "red",
+        "fontStyle": "italic",
+        "fontSize": 12
+      },
+      "encoding": {
+        "x": { "field": "Year", "type": "quantitative" },
+        "y": { "field": "rain_mm", "type": "quantitative" },
+        "text": { "field": "label" }
+      }
+    }
+  ]
+}
+</script>
 
 
   <!-- Top locations -->
@@ -561,6 +596,7 @@
   </script>
 </body>
 </html>
+
 
 
 
