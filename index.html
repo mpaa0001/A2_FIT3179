@@ -312,27 +312,62 @@
 </script>
 
   <!-- Map -->
-  <script type="application/json" id="spec-map">{
-    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
-    "width":900,"height":500,
-    "title":{"text":{"expr":"'Rainfall by State — ' + mapYear"},"anchor":"start"},
-    "projection":{"type":"mercator"},
-    "params":[{"name":"mapYear","value":2017,"bind":{"name":"Year: ","input":"range","min":2008,"max":2017,"step":1}}],
-    "data":{"url":"AUS_states.json","format":{"type":"topojson","feature":"AUS_states"}},
-    "transform":[
-      {"calculate":"({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[(datum.properties && (datum.properties.STATE_NAME ? datum.properties.STATE_NAME : (datum.properties.name ? datum.properties.name : datum.properties.STE_NAME21)))]","as":"abbr"},
-      {"lookup":"abbr",
-       "from":{"data":{"url":"rainfall_by_state.csv"},
-               "transform":[{"calculate":"toNumber(datum.Year)","as":"Y"},{"filter":"datum.Y == mapYear"}],
-               "key":"State","fields":["rain_mm"]}}
-    ],
-    "mark":{"type":"geoshape","stroke":"white"},
-    "encoding":{
-      "color":{"field":"rain_mm","type":"quantitative","title":"Avg rainfall (mm)","scale":{"scheme":"blues"}},
-      "tooltip":[{"field":"properties.STATE_NAME","type":"nominal","title":"State"},
-                 {"field":"abbr","type":"nominal","title":"Code"},
-                 {"field":"rain_mm","type":"quantitative","format":".2f","title":"Avg (mm)"}]
-    }}</script>
+<script type="application/json" id="spec-map">
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 500,
+  "title": { "text": { "expr": "'Rainfall by State — ' + mapYear" }, "anchor": "start" },
+  "projection": { "type": "mercator" },
+  "params": [
+    {
+      "name": "mapYear",
+      "value": 2017,
+      "bind": { "name": "Year: ", "input": "range", "min": 2008, "max": 2017, "step": 1 }
+    }
+  ],
+  "data": {
+    "url": "AUS_states.json",
+    "format": { "type": "topojson", "feature": "AUS_states" }
+  },
+  "transform": [
+    {
+      "calculate": "datum.properties.STATE_NAME || datum.properties.name || datum.properties.STE_NAME21",
+      "as": "StateName"
+    },
+    {
+      "calculate": "({'New South Wales':'NSW','Northern Territory':'NT','Queensland':'QLD','South Australia':'SA','Tasmania':'TAS','Victoria':'VIC','Western Australia':'WA','Australian Capital Territory':'ACT'})[datum.StateName]",
+      "as": "abbr"
+    },
+    {
+      "lookup": "abbr",
+      "from": {
+        "data": { "url": "rainfall_by_state.csv" },
+        "transform": [
+          { "calculate": "toNumber(datum.Year)", "as": "Y" },
+          { "filter": "datum.Y == mapYear" }
+        ],
+        "key": "State",
+        "fields": ["rain_mm"]
+      }
+    }
+  ],
+  "mark": { "type": "geoshape", "stroke": "white" },
+  "encoding": {
+    "color": {
+      "field": "rain_mm",
+      "type": "quantitative",
+      "title": "Avg rainfall (mm)",
+      "scale": { "scheme": "blues" }
+    },
+    "tooltip": [
+      { "field": "StateName", "type": "nominal", "title": "State" },
+      { "field": "rain_mm", "type": "quantitative", "format": ".2f", "title": "Avg rainfall (mm)" }
+    ]
+  }
+}
+</script>
+
 
 
 
@@ -527,6 +562,7 @@
   </script>
 </body>
 </html>
+
 
 
 
