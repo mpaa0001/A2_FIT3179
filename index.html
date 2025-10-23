@@ -77,9 +77,14 @@
 .map-notes{ flex:0 0 360px; align-self:flex-start; margin-top:0; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; background:#fff; line-height:1.35; }
 
 /* ===== rainfall vs temp ===== */
-.scatter-row{ display:flex; flex-direction: column; gap:16px; align-items:flex-start; }
-.scatter-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
-.scatter-notes{ flex:0 0 360px; align-self:flex-start; margin-top:0; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; background:#fff; line-height:1.35; }
+    .scatter-row{ display:flex; gap:16px; align-items:flex-start; }
+    .scatter-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
+    .scatter-notes{
+      flex:0 0 360px; align-self:flex-start;
+      margin-top: var(--scatter-title-offset);
+      border:1px solid #e5e7eb; border-radius:8px;
+      padding:10px 12px; background:#fff; line-height:1.35;
+    }
 
 /* ===== seasonality ===== */
 .season-row{ display:flex; flex-direction: column; gap:16px; align-items:flex-start; }
@@ -420,6 +425,7 @@
   </script>
 </body>
 </html>
+
 
 
 
