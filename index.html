@@ -241,21 +241,46 @@
 
   <!-- Trend -->
   <script type="application/json" id="spec-trend">{
-    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
-    "width":900,"height":320,
-    "title":{"text":"Average Annual Rainfall — Australia (2008–2017)","anchor":"start","offset":6},
-    "data":{"url":"rainfall_timeseries.csv"},
-    "transform":[{"filter":"datum.Year >= 2008 && datum.Year <= 2017"}],
-    "layer":[
-      {"transform":[{"aggregate":[{"op":"mean","field":"rain_mm","as":"mean_mm"}]}],
-       "mark":{"type":"rule","strokeDash":[6,4],"color":"#888"},
-       "encoding":{"y":{"field":"mean_mm","type":"quantitative","title":"Rainfall (mm)"}}},
-      {"mark":{"type":"line","point":true},
-       "encoding":{"x":{"field":"Year","type":"quantitative","title":"Year","axis":{"format":"d","tickMinStep":1}},
-                   "y":{"field":"rain_mm","type":"quantitative","title":"Rainfall (mm)"},
-                   "tooltip":[{"field":"Year","type":"quantitative"},
-                              {"field":"rain_mm","type":"quantitative","format":".2f","title":"Avg (mm)"}]}}
-    ]}</script>
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Average Annual Rainfall — Australia (2008–2017)",
+  "width": 700,
+  "height": 400,
+  "layer": [
+    {
+      "data": { "url": "rainfall_national_avg.csv" },
+      "mark": {
+        "type": "line",
+        "point": true
+      },
+      "encoding": {
+        "x": { "field": "Year", "type": "ordinal", "title": "Year" },
+        "y": { "field": "Rainfall", "type": "quantitative", "title": "Rainfall (mm)" }
+      }
+    },
+    {
+      "data": {
+        "values": [
+          { "Year": "2011", "Rainfall": 2.85, "label": "La Niña" },
+          { "Year": "2014", "Rainfall": 1.95, "label": "El Niño" }
+        ]
+      },
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dy": -15,
+        "fontSize": 12,
+        "fontStyle": "italic",
+        "color": "#d62728"
+      },
+      "encoding": {
+        "x": { "field": "Year", "type": "ordinal" },
+        "y": { "field": "Rainfall", "type": "quantitative" },
+        "text": { "field": "label" }
+      }
+    }
+  ]
+}
+</script>
 
   <!-- Top locations -->
   <script type="application/json" id="spec-toploc">
@@ -475,6 +500,7 @@
   </script>
 </body>
 </html>
+
 
 
 
