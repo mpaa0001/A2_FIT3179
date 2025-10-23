@@ -61,55 +61,31 @@
       --season-title-offset: 36px;
     }
 
-    /* ===== trend ===== */
-    .trend-row{ display:flex; gap:16px; align-items:flex-start; }
-    .trend-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
-    .trend-notes{
-      flex:0 0 360px; align-self:flex-start;
-      margin-top: var(--trend-title-offset);
-      border:1px solid #e5e7eb; border-radius:8px;
-      padding:10px 12px; background:#fff; line-height:1.35;
-    }
+ /* ===== trend ===== */
+.trend-row{ display:flex; flex-direction: column; gap:16px; align-items:flex-start; }
+.trend-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
+.trend-notes{ flex:0 0 360px; align-self:flex-start; margin-top:0; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; background:#fff; line-height:1.35; }
 
-    /* ===== top 10 ===== */
-    .toploc-row{ display:flex; gap:16px; align-items:flex-start; }
-    .toploc-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
-    .toploc-notes{
-      flex:0 0 360px; align-self:flex-start;
-      margin-top: var(--toploc-title-offset);
-      border:1px solid #e5e7eb; border-radius:8px;
-      padding:10px 12px; background:#fff; line-height:1.35;
-    }
+/* ===== top 10 ===== */
+.toploc-row{ display:flex; flex-direction: column; gap:16px; align-items:flex-start; }
+.toploc-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
+.toploc-notes{ flex:0 0 360px; align-self:flex-start; margin-top:0; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; background:#fff; line-height:1.35; }
 
-    /* ===== map ===== */
-    .map-row{ display:flex; gap:16px; align-items:flex-start; }
-    .map-chart{ flex:1 1 auto; min-width:640px; min-height:520px; }
-    .map-notes{
-      flex:0 0 360px; align-self:flex-start;
-      margin-top: var(--map-title-offset);
-      border:1px solid #e5e7eb; border-radius:8px;
-      padding:10px 12px; background:#fff; line-height:1.35;
-    }
+/* ===== map ===== */
+.map-row{ display:flex; flex-direction: column; gap:16px; align-items:flex-start; }
+.map-chart{ flex:1 1 auto; min-width:640px; min-height:520px; }
+.map-notes{ flex:0 0 360px; align-self:flex-start; margin-top:0; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; background:#fff; line-height:1.35; }
 
-    /* ===== rainfall vs temp ===== */
-    .scatter-row{ display:flex; gap:16px; align-items:flex-start; }
-    .scatter-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
-    .scatter-notes{
-      flex:0 0 360px; align-self:flex-start;
-      margin-top: var(--scatter-title-offset);
-      border:1px solid #e5e7eb; border-radius:8px;
-      padding:10px 12px; background:#fff; line-height:1.35;
-    }
+/* ===== rainfall vs temp ===== */
+.scatter-row{ display:flex; flex-direction: column; gap:16px; align-items:flex-start; }
+.scatter-chart{ flex:1 1 auto; min-width:640px; min-height:420px; }
+.scatter-notes{ flex:0 0 360px; align-self:flex-start; margin-top:0; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; background:#fff; line-height:1.35; }
 
-    /* ===== seasonality ===== */
-    .season-row{ display:flex; gap:16px; align-items:flex-start; }
-    .season-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
-    .season-notes{
-      flex:0 0 360px; align-self:flex-start;
-      margin-top: var(--season-title-offset);
-      border:1px solid #e5e7eb; border-radius:8px;
-      padding:10px 12px; background:#fff; line-height:1.35;
-    }
+/* ===== seasonality ===== */
+.season-row{ display:flex; flex-direction: column; gap:16px; align-items:flex-start; }
+.season-chart{ flex:1 1 auto; min-width:640px; min-height:320px; }
+.season-notes{ flex:0 0 360px; align-self:flex-start; margin-top:0; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; background:#fff; line-height:1.35; }
+
 
     /* Stack on small screens */
     @media (max-width: 900px){
@@ -444,6 +420,7 @@
   </script>
 </body>
 </html>
+
 
 
 
