@@ -432,27 +432,78 @@
 
 
   <!-- Seasonality -->
-  <script type="application/json" id="spec-seasonality">{
-    "$schema":"https://vega.github.io/schema/vega-lite/v5.json",
-    "width":900,"height":320,
-    "title":"Average Monthly Rainfall — Australia (2008–2017)",
-    "data":{"url":"weatherAUS.csv","format":{"type":"csv","parse":{"Date":"date","Rainfall":"number"}}},
-    "transform":[
-      {"filter":"isValid(datum.Rainfall) && isFinite(+datum.Rainfall)"},
-      {"calculate":"year(datum.Date)","as":"Y"},
-      {"filter":"datum.Y >= 2008 && datum.Y <= 2017"}
-    ],
-    "encoding":{
-      "x":{"timeUnit":"month","field":"Date","title":null,"axis":{"format":"%b"}},
-      "y":{"aggregate":"mean","field":"Rainfall","title":"Avg rainfall (mm)"},
-      "tooltip":[{"timeUnit":"month","field":"Date","title":"Month","format":"%b"},
-                 {"aggregate":"mean","field":"Rainfall","title":"Avg (mm)","format":".2f"}]
+ <script type="application/json" id="spec-seasonality">
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 320,
+  "title": "Average Monthly Rainfall — Australia (2008–2017)",
+  "data": {
+    "url": "weatherAUS.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "Date": "date",
+        "Rainfall": "number"
+      }
+    }
+  },
+  "transform": [
+    { "filter": "isValid(datum.Rainfall) && isFinite(+datum.Rainfall)" },
+    { "calculate": "year(datum.Date)", "as": "Y" },
+    { "filter": "datum.Y >= 2008 && datum.Y <= 2017" }
+  ],
+  "encoding": {
+    "x": {
+      "timeUnit": "month",
+      "field": "Date",
+      "title": null,
+      "axis": { "format": "%b" }
     },
-    "layer":[
-      {"mark":{"type":"area","opacity":0.15}},
-      {"mark":{"type":"line"}},
-      {"mark":{"type":"point"}}
-    ]}</script>
+    "y": {
+      "aggregate": "mean",
+      "field": "Rainfall",
+      "title": "Avg rainfall (mm)"
+    },
+    "tooltip": [
+      { "timeUnit": "month", "field": "Date", "title": "Month", "format": "%b" },
+      { "aggregate": "mean", "field": "Rainfall", "title": "Avg (mm)", "format": ".2f" }
+    ]
+  },
+  "layer": [
+    { "mark": { "type": "area", "opacity": 0.15 } },
+    { "mark": { "type": "line" } },
+    { "mark": { "type": "point" } },
+    {
+      "data": {
+        "values": [
+          { "month": "Feb", "Rainfall": 3.2, "label": "Wettest month" },
+          { "month": "Oct", "Rainfall": 1.6, "label": "Driest month" }
+        ]
+      },
+      "transform": [
+        {
+          "calculate": "toDate('2023-' + datum.month + '-01')",
+          "as": "MonthDate"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": -12,
+        "color": "red",
+        "fontStyle": "italic",
+        "fontSize": 12
+      },
+      "encoding": {
+        "x": { "field": "MonthDate", "type": "temporal", "timeUnit": "month" },
+        "y": { "field": "Rainfall", "type": "quantitative" },
+        "text": { "field": "label" }
+      }
+    }
+  ]
+}
+</script>
+
 
 
 
@@ -476,6 +527,7 @@
   </script>
 </body>
 </html>
+
 
 
 
