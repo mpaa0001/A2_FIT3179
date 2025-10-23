@@ -11,16 +11,47 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
   <style>
-    .subtitle {
-  text-align: center;
-  font-size: 1.05rem;
-  font-weight: 500;
-  margin: -0.5rem 0 1.5rem;
-  color: #555;
-}
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0 20px 40px;
+    }
 
-    /* headings */
-    h1, p.header-sub { text-align:center; margin: 0.25rem 0 1rem; }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-top: 1.2rem;
+    }
+
+    .header-sub {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin: -0.5rem 0 1.5rem;
+      color: #555;
+    }
+
+    /* ====== Tile container ====== */
+    .chart-tile {
+      border: 1px solid #dcdcdc;
+      border-radius: 12px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding: 25px;
+      margin: 30px auto;
+      max-width: 1200px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
 
     :root {
       --trend-title-offset: 36px;
@@ -93,79 +124,87 @@
   <p class="header-sub"><strong>Melanie Paaris 33116121</strong></p>
 
   <!-- ===== National Annual Rainfall ===== -->
-  <h2 style="text-align:center;">National Annual Rainfall</h2>
-  <p class="subtitle">Yearly average rainfall across Australia from 2008 to 2017.</p>
-  <section class="trend-row">
-    <div id="trend" class="trend-chart"></div>
-    <aside class="trend-notes">
-      <ul style="margin:0; padding-left:1rem;">
-        <li><strong>Wettest period:</strong> 2010–2011 sits clearly above the mean, indicating an unusually wet couple of years.</li>
-        <li><strong>Driest year:</strong> 2014 falls well below the mean, marking the decade’s low point.</li>
-        <li><strong>Overall pattern:</strong> No strong long-term trend, rise to 2011, decrease to 2014, then steady recovery; most years near the mean.</li>
-      </ul>
-    </aside>
-  </section>
+  <div class="chart-tile">
+    <h2>National Annual Rainfall</h2>
+    <p class="subtitle">Yearly average rainfall across Australia from 2008 to 2017.</p>
+    <section class="trend-row">
+      <div id="trend" class="trend-chart"></div>
+      <aside class="trend-notes">
+        <ul style="margin:0; padding-left:1rem;">
+          <li><strong>Wettest period:</strong> 2010–2011 sits clearly above the mean, indicating an unusually wet couple of years.</li>
+          <li><strong>Driest year:</strong> 2014 falls well below the mean, marking the decade’s low point.</li>
+          <li><strong>Overall pattern:</strong> No strong long-term trend, rise to 2011, decrease to 2014, then steady recovery; most years near the mean.</li>
+        </ul>
+      </aside>
+    </section>
+  </div>
 
   <!-- ===== Top 10 Locations (by year) ===== -->
-  <h2 style="text-align:center;">Top 10 Locations (by Year)</h2>
-  <p class="subtitle">Top 10 locations with the highest average rainfall each year.</p>
-  <section class="toploc-row">
-    <div id="toploc" class="toploc-chart"></div>
-    <aside class="toploc-notes">
-      <ul style="margin:0; padding-left:1rem;">
-        <li><strong>Cairns & Coffs Harbour lead often;</strong> Darwin surges to #1 in 2017 with the decade’s peak.</li>
-        <li><strong>Tropical/east-coast hubs dominate</strong> (Cairns, Darwin, Townsville, Coffs Harbour, Gold Coast, Sydney/Wollongong/Newcastle); inland/southern sites are rare.</li>
-        <li><strong>Year-to-year swings:</strong> strong around 2010–11, softer 2014–16, then a sharp rebound in 2017.</li>
-      </ul>
-    </aside>
-  </section>
+  <div class="chart-tile">
+    <h2>Top 10 Locations (by Year)</h2>
+    <p class="subtitle">Top 10 locations with the highest average rainfall each year.</p>
+    <section class="toploc-row">
+      <div id="toploc" class="toploc-chart"></div>
+      <aside class="toploc-notes">
+        <ul style="margin:0; padding-left:1rem;">
+          <li><strong>Cairns & Coffs Harbour lead often;</strong> Darwin surges to #1 in 2017 with the decade’s peak.</li>
+          <li><strong>Tropical/east-coast hubs dominate</strong> (Cairns, Darwin, Townsville, Coffs Harbour, Gold Coast, Sydney/Wollongong/Newcastle); inland/southern sites are rare.</li>
+          <li><strong>Year-to-year swings:</strong> strong around 2010–11, softer 2014–16, then a sharp rebound in 2017.</li>
+        </ul>
+      </aside>
+    </section>
+  </div>
 
   <!-- ===== Rainfall by State (Choropleth) ===== -->
-  <h2 style="text-align:center;">Rainfall by State</h2>
-  <p class="subtitle">Rainfall distribution across states for the selected year.</p>
-  <section class="map-row">
-    <div id="map" class="map-chart"></div>
-    <aside class="map-notes">
-      <ul style="margin:0; padding-left:1rem;">
-        <li><strong>Top-end stays wettest:</strong> Northern Territory and Queensland dominate state averages most years, with standout peaks in QLD ~5.74&nbsp;mm (2010) and NT ~5.70&nbsp;mm (2017).</li>
-        <li><strong>South/temperate states are driest:</strong> SA, TAS, VIC and ACT mostly sit around ~1–2&nbsp;mm; lows include SA ~0.98&nbsp;mm (2015) and ACT ~1.05&nbsp;mm (2017).</li>
-        <li><strong>Clear year-to-year swings:</strong> Broad spike 2010–11 (especially QLD/NT), a trough around 2014–15, then a rebound by 2016–17.</li>
-      </ul>
-    </aside>
-  </section>
+  <div class="chart-tile">
+    <h2>Rainfall by State</h2>
+    <p class="subtitle">Rainfall distribution across states for the selected year.</p>
+    <section class="map-row">
+      <div id="map" class="map-chart"></div>
+      <aside class="map-notes">
+        <ul style="margin:0; padding-left:1rem;">
+          <li><strong>Top-end stays wettest:</strong> Northern Territory and Queensland dominate state averages most years, with standout peaks in QLD ~5.74 mm (2010) and NT ~5.70 mm (2017).</li>
+          <li><strong>South/temperate states are driest:</strong> SA, TAS, VIC and ACT mostly sit around ~1–2 mm; lows include SA ~0.98 mm (2015) and ACT ~1.05 mm (2017).</li>
+          <li><strong>Clear year-to-year swings:</strong> Broad spike 2010–11 (especially QLD/NT), a trough around 2014–15, then a rebound by 2016–17.</li>
+        </ul>
+      </aside>
+    </section>
+  </div>
 
   <!-- ===== Rainfall vs Temperature ===== -->
-<h2 style="text-align:center;">Rainfall vs Temperature</h2>
-<p class="subtitle">How rainfall levels vary with temperature across seasons.</p>
+  <div class="chart-tile">
+    <h2>Rainfall vs Temperature</h2>
+    <p class="subtitle">How rainfall levels vary with temperature across seasons.</p>
+    <section class="scatter-row">
+      <div id="rainTemp" class="scatter-chart"></div>
+      <aside class="scatter-notes">
+        <ul style="margin:0; padding-left:1rem;">
+          <li><strong>Winter and Spring are the wettest seasons:</strong> The higher concentration of blue (Winter) and green (Spring) dots shows most rainfall occurs during cooler months with moderate temperatures (10°C–25°C).</li>
+          <li><strong>Rainfall decreases as temperature rises:</strong> The downward trend suggests an inverse relationship; cooler months tend to be wetter, while hotter months receive less rainfall.</li>
+          <li><strong>Summer and Autumn have rare extremes:</strong> A few red (Summer) and yellow (Autumn) outliers show heavy rain with high temperatures, likely from tropical regions like Darwin and Cairns.</li>
+        </ul>
+      </aside>
+    </section>
+  </div>
 
-<section class="scatter-row">
-  <div id="rainTemp" class="scatter-chart"></div>
-  <aside class="scatter-notes">
-    <ul style="margin:0; padding-left:1rem;">
-      <li><strong>Winter and Spring are the wettest seasons:</strong> The higher concentration of blue (Winter) and green (Spring) dots shows most rainfall occurs during cooler months with moderate temperatures (10°C–25°C).</li>
-      <li><strong>Rainfall decreases as temperature rises:</strong> The downward trend suggests an inverse relationship; cooler months tend to be wetter, while hotter months receive less rainfall.</li>
-      <li><strong>Summer and Autumn have rare extremes:</strong> A few red (Summer) and yellow (Autumn) outliers show heavy rain with high temperatures, likely from tropical regions like Darwin and Cairns.</li>
-    </ul>
-  </aside>
-</section>
-
-
-<h2 style="text-align:center;">Seasonal Rainfall Patterns</h2>
-<section class="season-row">
-<p class="subtitle">Average rainfall trends across months, highlighting seasonal patterns.</p>
-
-  <div id="seasonality" class="season-chart"></div>
-  <aside class="season-notes">
-    <ul style="margin:0; padding-left:1rem;">
-      <li><strong>Wettest months (Dec–Mar):</strong> These summer months show the highest average rainfall, reflecting Australia’s <em>northern wet season</em> influenced by tropical monsoons.</li>
-      <li><strong>Driest period (Jun–Oct):</strong> Mid to late year experiences the lowest rainfall, representing the <em>national dry season</em>, especially in central and northern regions.</li>
-      <li><strong>Clear seasonal pattern:</strong> The smooth rise and fall of the curve reveal a predictable annual rainfall cycle, with strong contrasts between wet and dry periods across the country.</li>
-    </ul>
-    <p style="margin:10px 0 0;">
-      <strong>Summary:</strong> Australia’s national rainfall seasonality reflects <em>two overlapping systems</em> ; tropical summer monsoons in the north and winter westerly rain in the south ; producing peaks in early summer and mid-year, with a pronounced dry period around September–October.
-    </p>
-  </aside>
-</section>
+  <!-- ===== Seasonal Rainfall Patterns ===== -->
+  <div class="chart-tile">
+    <h2>Seasonal Rainfall Patterns</h2>
+    <p class="subtitle">Average rainfall trends across months, highlighting seasonal patterns.</p>
+    <section class="season-row">
+      <div id="seasonality" class="season-chart"></div>
+      <aside class="season-notes">
+        <ul style="margin:0; padding-left:1rem;">
+          <li><strong>Wettest months (Dec–Mar):</strong> These summer months show the highest average rainfall, reflecting Australia’s <em>northern wet season</em> influenced by tropical monsoons.</li>
+          <li><strong>Driest period (Jun–Oct):</strong> Mid to late year experiences the lowest rainfall, representing the <em>national dry season</em>.</li>
+          <li><strong>Clear seasonal pattern:</strong> The smooth rise and fall of the curve reveal a predictable annual rainfall cycle with strong contrasts between wet and dry periods.</li>
+        </ul>
+        <p style="margin:10px 0 0;">
+          <strong>Summary:</strong> Australia’s rainfall seasonality reflects <em>two overlapping systems</em>: tropical summer monsoons in the north and winter westerly rain in the south.
+        </p>
+      </aside>
+    </section>
+  </div>
 
   <!-- ================= Vega-Lite SPECS ================= -->
 
@@ -405,6 +444,7 @@
   </script>
 </body>
 </html>
+
 
 
 
